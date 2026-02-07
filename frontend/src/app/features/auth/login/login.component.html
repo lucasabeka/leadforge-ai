@@ -1,0 +1,53 @@
+<div class="login-container">
+  <div class="login-card">
+    <h1>Connexion à LeadForge</h1>
+    <p class="subtitle">Générez vos prospects B2B avec l'IA</p>
+
+    <form (ngSubmit)="onSubmit()" #loginForm="ngForm">
+      <div class="form-group">
+        <label for="email">Email</label>
+        <input
+          type="email"
+          id="email"
+          name="email"
+          [(ngModel)]="email"
+          required
+          email
+          placeholder="exemple@email.com"
+          [disabled]="loading"
+        />
+      </div>
+
+      <div class="form-group">
+        <label for="password">Mot de passe</label>
+        <input
+          type="password"
+          id="password"
+          name="password"
+          [(ngModel)]="password"
+          required
+          minlength="6"
+          placeholder="••••••••"
+          [disabled]="loading"
+        />
+      </div>
+
+      <div *ngIf="error" class="error-message">
+        {{ error }}
+      </div>
+
+      <button
+        type="submit"
+        class="btn-primary"
+        [disabled]="!loginForm.valid || loading"
+      >
+        {{ loading ? 'Connexion...' : 'Se connecter' }}
+      </button>
+
+      <p class="register-link">
+        Pas encore de compte ?
+        <a routerLink="/register">Créer un compte</a>
+      </p>
+    </form>
+  </div>
+</div>

@@ -1,0 +1,61 @@
+<div class="purchase-container">
+  <div class="purchase-card">
+    <button routerLink="/dashboard" class="back-btn">← Retour au dashboard</button>
+
+    <h1>Acheter des crédits</h1>
+    <p class="subtitle">1 crédit = 1 prospect qualifié avec email personnalisé</p>
+
+    <div class="current-balance">
+      <span class="balance-label">Solde actuel</span>
+      <span class="balance-amount">{{ currentCredits }} crédits</span>
+    </div>
+
+    <div *ngIf="successMessage" class="success-message">
+      ✅ {{ successMessage }}
+    </div>
+
+    <div *ngIf="errorMessage" class="error-message">
+      ❌ {{ errorMessage }}
+    </div>
+
+    <div class="packages-grid">
+      <div *ngFor="let package of packages"
+           class="package-card"
+           [class.popular]="package.popular">
+        <div *ngIf="package.popular" class="popular-badge">
+          ⭐ Le plus populaire
+        </div>
+        <div *ngIf="package.savings" class="savings-badge">
+          Économisez {{ package.savings }}
+        </div>
+
+        <h3>{{ package.credits }} crédits</h3>
+        <div class="price">
+          <span class="amount">{{ package.price }}€</span>
+          <span class="per-credit">{{ (package.price / package.credits).toFixed(2) }}€ / crédit</span>
+        </div>
+
+        <ul class="features">
+          <li>✓ {{ package.credits }} prospects qualifiés</li>
+          <li>✓ Emails personnalisés par IA</li>
+          <li>✓ Export CSV illimité</li>
+          <li>✓ Crédits valables 1 an</li>
+        </ul>
+
+        <button
+          (click)="purchasePackage(package.credits, package.price)"
+          [disabled]="loading"
+          class="btn-purchase"
+          [class.popular]="package.popular">
+          {{ loading ? 'Traitement...' : 'Acheter maintenant' }}
+        </button>
+      </div>
+    </div>
+
+    <div class="payment-info">
+      <p>💳 Paiement sécurisé (Stripe intégration à venir)</p>
+      <p>🔒 Vos données sont protégées</p>
+      <p>↩️ Satisfait ou remboursé sous 7 jours</p>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,70 @@
+<div class="dashboard-container">
+  <header class="dashboard-header">
+    <div class="header-left">
+      <h1>LeadForge AI</h1>
+      <p *ngIf="user$ | async as user" class="user-name">{{ user.name }}</p>
+    </div>
+    <div class="header-actions">
+      <button routerLink="/campaigns/new" class="btn-primary">
+        + Nouvelle campagne
+      </button>
+      <button (click)="logout()" class="btn-secondary">
+        Déconnexion
+      </button>
+    </div>
+  </header>
+
+  <div class="stats-row">
+    <div class="stat-card">
+      <h3>{{ stats.campaigns }}</h3>
+      <p>Campagnes</p>
+    </div>
+    <div class="stat-card">
+      <h3>{{ stats.prospects }}</h3>
+      <p>Prospects générés</p>
+    </div>
+    <div class="stat-card highlight" routerLink="/credits/purchase" style="cursor: pointer;">
+      <h3>{{ stats.credits }}</h3>
+      <p>Crédits restants</p>
+      <small style="margin-top: 8px; display: block; font-weight: 600;">
+        + Acheter des crédits
+      </small>
+    </div>
+  </div>
+
+  <div class="campaigns-section">
+    <h2>Mes Campagnes</h2>
+
+    <div *ngIf="loading" class="loading">
+      Chargement...
+    </div>
+
+    <div *ngIf="!loading && campaigns.length > 0" class="campaigns-grid">
+      <div *ngFor="let campaign of campaigns"
+           class="campaign-card"
+           [routerLink]="['/campaigns', campaign.id]">
+        <div class="campaign-header">
+          <h3>{{ campaign.name }}</h3>
+          <span class="status-badge" [class]="campaign.status.toLowerCase()">
+            {{ getStatusLabel(campaign.status) }}
+          </span>
+        </div>
+        <div class="campaign-details">
+          <p><strong>Industrie:</strong> {{ campaign.industry }}</p>
+          <p><strong>Cible:</strong> {{ campaign.jobTitle }}</p>
+          <p><strong>Localisation:</strong> {{ campaign.location }}</p>
+          <p><strong>Prospects:</strong> {{ campaign.prospectsCount || 0 }}</p>
+          <p class="date">{{ campaign.createdAt | date:'short' }}</p>
+        </div>
+      </div>
+    </div>
+
+    <div *ngIf="!loading && campaigns.length === 0" class="empty-state">
+      <h3>Aucune campagne pour le moment</h3>
+      <p>Créez votre première campagne pour commencer à générer des prospects</p>
+      <button routerLink="/campaigns/new" class="btn-primary">
+        Créer ma première campagne
+      </button>
+    </div>
+  </div>
+</div>

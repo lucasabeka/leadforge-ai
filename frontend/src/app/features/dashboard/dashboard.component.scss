@@ -1,0 +1,235 @@
+.dashboard-container {
+  min-height: 100vh;
+  background-color: #f5f7fa;
+}
+
+.dashboard-header {
+  background: white;
+  padding: 24px 40px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  .header-left {
+    h1 {
+      margin: 0;
+      font-size: 24px;
+      color: #333;
+      font-weight: 700;
+    }
+
+    .user-name {
+      margin: 4px 0 0 0;
+      color: #666;
+      font-size: 14px;
+    }
+  }
+
+  .header-actions {
+    display: flex;
+    gap: 12px;
+
+    .btn-secondary {
+      background: white;
+      color: #666;
+      border: 1px solid #ddd;
+      padding: 10px 20px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 14px;
+
+      &:hover {
+        background-color: #f5f5f5;
+      }
+    }
+  }
+}
+
+.stats-row {
+  max-width: 1200px;
+  margin: 40px auto 40px;
+  padding: 0 40px;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 20px;
+}
+
+.stat-card {
+  background: white;
+  padding: 24px;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  transition: transform 0.2s;
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+  }
+
+  &.highlight {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+
+    h3, p {
+      color: white;
+    }
+  }
+
+  h3 {
+    font-size: 36px;
+    color: #667eea;
+    margin: 0 0 8px 0;
+    font-weight: 700;
+  }
+
+  p {
+    color: #666;
+    font-size: 14px;
+    margin: 0;
+  }
+}
+
+.campaigns-section {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 40px 40px;
+
+  h2 {
+    margin-bottom: 24px;
+    color: #333;
+    font-size: 20px;
+    font-weight: 600;
+  }
+}
+
+.loading {
+  text-align: center;
+  padding: 40px;
+  color: #666;
+}
+
+.campaigns-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 20px;
+}
+
+.campaign-card {
+  background: white;
+  border-radius: 12px;
+  padding: 24px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  cursor: pointer;
+  transition: all 0.2s;
+
+  &:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.12);
+  }
+
+  .campaign-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 16px;
+
+    h3 {
+      margin: 0;
+      color: #333;
+      font-size: 18px;
+      font-weight: 600;
+      flex: 1;
+      padding-right: 12px;
+    }
+
+    .status-badge {
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 600;
+      white-space: nowrap;
+
+      &.pending {
+        background-color: #fef3c7;
+        color: #92400e;
+      }
+
+      &.processing {
+        background-color: #dbeafe;
+        color: #1e40af;
+      }
+
+      &.completed {
+        background-color: #d1fae5;
+        color: #065f46;
+      }
+
+      &.failed {
+        background-color: #fee2e2;
+        color: #991b1b;
+      }
+    }
+  }
+
+  .campaign-details {
+    p {
+      margin: 8px 0;
+      color: #666;
+      font-size: 14px;
+
+      strong {
+        color: #333;
+        font-weight: 600;
+      }
+
+      &.date {
+        margin-top: 16px;
+        padding-top: 16px;
+        border-top: 1px solid #eee;
+        font-size: 12px;
+        color: #999;
+      }
+    }
+  }
+}
+
+.empty-state {
+  background: white;
+  padding: 80px 40px;
+  border-radius: 12px;
+  text-align: center;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+
+  h3 {
+    color: #333;
+    margin-bottom: 12px;
+    font-size: 20px;
+  }
+
+  p {
+    color: #666;
+    margin-bottom: 24px;
+    font-size: 14px;
+  }
+
+  .btn-primary {
+    padding: 12px 32px;
+  }
+}
+
+.btn-primary {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity 0.2s;
+
+  &:hover {
+    opacity: 0.9;
+  }
+}
