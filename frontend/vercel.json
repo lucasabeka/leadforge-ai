@@ -1,7 +1,5 @@
 {
-  "buildCommand": "ng build --configuration production",
+  "buildCommand": "ng build --configuration production --ssr=false",
   "outputDirectory": "dist/leadforge-app/browser",
-  "framework": null,
-  "installCommand": "npm install"
+  "framework": null
 }
-
