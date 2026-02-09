@@ -1,5 +1,5 @@
 export const environment = {
   production: true,
-  apiUrl: 'https://leadforge-ai-production-2d14.up.railway.app/'
-  // Remplacez par votre vraie URL Railway !
+  apiUrl: 'https://leadforge-ai-production-2d14.up.railway.app/api'
+  // PAS de slash à la fin, ET inclure /api
 };
