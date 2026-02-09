@@ -32,4 +32,4 @@ Thumbs.db
 
 # Env
 *.env
-backend/src/main/resources/application-prod.properties
+application-local.properties
