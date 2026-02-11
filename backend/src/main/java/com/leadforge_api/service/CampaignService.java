@@ -27,7 +27,6 @@ public class CampaignService {
 
     @Autowired
     private ClaudeService claudeService;
-
     public Campaign createCampaign(Campaign campaign) {
         campaign.setStatus(CampaignStatus.PENDING);
         campaign.setCreatedAt(LocalDateTime.now());
@@ -43,9 +42,13 @@ public class CampaignService {
             campaign.setStatus(CampaignStatus.PROCESSING);
             campaignRepository.save(campaign);
 
+            // Simuler un délai de traitement
             Thread.sleep(3000);
+
+            // Générer prospects mockés
             List<Prospect> prospects = generateMockProspects(campaign);
 
+            // ✅ MODE DÉMO - Templates uniquement (pas d'appel Claude)
             for (Prospect prospect : prospects) {
                 prospect.setEmailSubject(generateFallbackSubject(prospect, campaign));
                 prospect.setEmailBody(generateFallbackEmail(prospect, campaign));
@@ -83,6 +86,7 @@ public class CampaignService {
                 "Vertex Solutions", "Nexus Group", "Quantum Tech", "Pulse Digital",
                 "Peak Ventures", "Summit Digital", "Horizon Tech", "Catalyst Group"};
 
+        // UTILISER campaign.getNumberOfProspects() au lieu de 50 en dur
         int numberOfProspects = campaign.getNumberOfProspects();
 
         for (int i = 0; i < numberOfProspects; i++) {
@@ -94,9 +98,9 @@ public class CampaignService {
             String company = companies[random.nextInt(companies.length)];
 
             prospect.setName(firstName + " " + lastName);
-            prospect.setCompany(company + " " + (i / 3));
+            prospect.setCompany(company + " " + (i / 3));  // Variante du nom
             prospect.setJobTitle(campaign.getJobTitle());
-            prospect.setEmail(generateProspectEmail(firstName, lastName, company));
+            prospect.setEmail(generateEmail(firstName, lastName, company));
             prospect.setLinkedinUrl("https://linkedin.com/in/" +
                     firstName.toLowerCase() + "-" + lastName.toLowerCase());
             prospect.setLocation(campaign.getLocation());
@@ -109,13 +113,27 @@ public class CampaignService {
         return prospects;
     }
 
-    private String generateProspectEmail(String firstName, String lastName, String company) {
+    private String generateEmail(String firstName, String lastName, String company) {
         String cleanCompany = company.toLowerCase()
                 .replace(" ", "")
                 .replace("é", "e")
                 .replace("è", "e");
         return firstName.toLowerCase() + "." + lastName.toLowerCase() +
                 "@" + cleanCompany + ".com";
+    }
+
+    private String generateEmailSubject(Prospect prospect, Campaign campaign) {
+        String firstName = prospect.getName().split(" ")[0];
+
+        String[] subjects = {
+                "Question rapide, " + firstName + " ?",
+                firstName + ", intéressé par " + campaign.getIndustry() + " ?",
+                "Idée pour " + prospect.getCompany(),
+                firstName + " - " + campaign.getPainPoint(),
+                "Votre stratégie " + campaign.getIndustry() + " chez " + prospect.getCompany()
+        };
+
+        return subjects[new Random().nextInt(subjects.length)];
     }
 
     private String generateFallbackSubject(Prospect prospect, Campaign campaign) {
@@ -126,16 +144,16 @@ public class CampaignService {
     private String generateFallbackEmail(Prospect prospect, Campaign campaign) {
         String firstName = prospect.getName().split(" ")[0];
         return String.format("""
-            Bonjour %s,
-            
-            Je travaille avec des entreprises comme %s dans le secteur %s.
-            
-            J'ai remarqué que vous pourriez être confronté à : %s
-            
-            Seriez-vous disponible pour un échange rapide cette semaine ?
-            
-            Cordialement
-            """,
+        Bonjour %s,
+        
+        Je travaille avec des entreprises comme %s dans le secteur %s.
+        
+        J'ai remarqué que vous pourriez être confronté à : %s
+        
+        Seriez-vous disponible pour un échange rapide cette semaine ?
+        
+        Cordialement
+        """,
                 firstName,
                 prospect.getCompany(),
                 campaign.getIndustry(),
