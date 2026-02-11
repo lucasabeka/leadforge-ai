@@ -41,7 +41,7 @@ public class AuthController {
         user.setEmail(request.getEmail());
         user.setPassword(passwordEncoder.encode(request.getPassword()));
         user.setName(request.getName());
-        user.setCredits(10); // 10 crédits gratuits à l'inscription
+        user.setCredits(25);
         user.setCreatedAt(LocalDateTime.now());
 
         user = userRepository.save(user);
@@ -76,7 +76,7 @@ public class AuthController {
     @GetMapping("/me")
     public ResponseEntity<?> getCurrentUser(@RequestHeader("Authorization") String authHeader) {
         try {
-            String token = authHeader.substring(7); // Enlever "Bearer "
+            String token = authHeader.substring(7);
             String email = jwtUtil.extractEmail(token);
 
             User user = userRepository.findByEmail(email)

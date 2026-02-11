@@ -26,7 +26,7 @@ public class CampaignService {
     private ProspectRepository prospectRepository;
 
     @Autowired
-    private AIService aiService;
+    private ClaudeService claudeService;
 
     public Campaign createCampaign(Campaign campaign) {
         campaign.setStatus(CampaignStatus.PENDING);
@@ -43,17 +43,12 @@ public class CampaignService {
             campaign.setStatus(CampaignStatus.PROCESSING);
             campaignRepository.save(campaign);
 
-            // Simuler un délai de traitement
             Thread.sleep(3000);
-
-            // Générer prospects mockés
             List<Prospect> prospects = generateMockProspects(campaign);
 
-            // Générer emails pour chaque prospect
             for (Prospect prospect : prospects) {
-                String email = aiService.generateEmail(prospect, campaign);
-                prospect.setEmailBody(email);
-                prospect.setEmailSubject(generateEmailSubject(prospect, campaign));
+                prospect.setEmailSubject(generateFallbackSubject(prospect, campaign));
+                prospect.setEmailBody(generateFallbackEmail(prospect, campaign));
             }
 
             prospectRepository.saveAll(prospects);
@@ -88,7 +83,6 @@ public class CampaignService {
                 "Vertex Solutions", "Nexus Group", "Quantum Tech", "Pulse Digital",
                 "Peak Ventures", "Summit Digital", "Horizon Tech", "Catalyst Group"};
 
-        // UTILISER campaign.getNumberOfProspects() au lieu de 50 en dur
         int numberOfProspects = campaign.getNumberOfProspects();
 
         for (int i = 0; i < numberOfProspects; i++) {
@@ -100,9 +94,9 @@ public class CampaignService {
             String company = companies[random.nextInt(companies.length)];
 
             prospect.setName(firstName + " " + lastName);
-            prospect.setCompany(company + " " + (i / 3));  // Variante du nom
+            prospect.setCompany(company + " " + (i / 3));
             prospect.setJobTitle(campaign.getJobTitle());
-            prospect.setEmail(generateEmail(firstName, lastName, company));
+            prospect.setEmail(generateProspectEmail(firstName, lastName, company));
             prospect.setLinkedinUrl("https://linkedin.com/in/" +
                     firstName.toLowerCase() + "-" + lastName.toLowerCase());
             prospect.setLocation(campaign.getLocation());
@@ -115,7 +109,7 @@ public class CampaignService {
         return prospects;
     }
 
-    private String generateEmail(String firstName, String lastName, String company) {
+    private String generateProspectEmail(String firstName, String lastName, String company) {
         String cleanCompany = company.toLowerCase()
                 .replace(" ", "")
                 .replace("é", "e")
@@ -124,18 +118,29 @@ public class CampaignService {
                 "@" + cleanCompany + ".com";
     }
 
-    private String generateEmailSubject(Prospect prospect, Campaign campaign) {
+    private String generateFallbackSubject(Prospect prospect, Campaign campaign) {
         String firstName = prospect.getName().split(" ")[0];
+        return firstName + ", intéressé par " + campaign.getIndustry() + " ?";
+    }
 
-        String[] subjects = {
-                "Question rapide, " + firstName + " ?",
-                firstName + ", intéressé par " + campaign.getIndustry() + " ?",
-                "Idée pour " + prospect.getCompany(),
-                firstName + " - " + campaign.getPainPoint(),
-                "Votre stratégie " + campaign.getIndustry() + " chez " + prospect.getCompany()
-        };
-
-        return subjects[new Random().nextInt(subjects.length)];
+    private String generateFallbackEmail(Prospect prospect, Campaign campaign) {
+        String firstName = prospect.getName().split(" ")[0];
+        return String.format("""
+            Bonjour %s,
+            
+            Je travaille avec des entreprises comme %s dans le secteur %s.
+            
+            J'ai remarqué que vous pourriez être confronté à : %s
+            
+            Seriez-vous disponible pour un échange rapide cette semaine ?
+            
+            Cordialement
+            """,
+                firstName,
+                prospect.getCompany(),
+                campaign.getIndustry(),
+                campaign.getPainPoint()
+        );
     }
 
     public List<Campaign> getUserCampaigns(User user) {

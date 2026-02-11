@@ -19,10 +19,30 @@ export class PurchaseComponent implements OnInit {
   errorMessage = '';
 
   packages = [
-    { credits: 100, price: 10, popular: false },
-    { credits: 500, price: 40, popular: true, savings: '20%' },
-    { credits: 1000, price: 70, popular: false, savings: '30%' },
-    { credits: 5000, price: 300, popular: false, savings: '40%' }
+    {
+      credits: 200,
+      price: 19,
+      popular: false,
+      savings: null
+    },
+    {
+      credits: 500,
+      price: 40,
+      popular: true,
+      savings: '20%'
+    },
+    {
+      credits: 1000,
+      price: 70,
+      popular: false,
+      savings: '30%'
+    },
+    {
+      credits: 5000,
+      price: 300,
+      popular: false,
+      savings: '40%'
+    }
   ];
 
   constructor(
@@ -66,6 +86,9 @@ export class PurchaseComponent implements OnInit {
           localStorage.setItem('user', JSON.stringify(user));
         }
 
+        // Refresh user data
+        this.authService.refreshCurrentUser().subscribe();
+
         // Rediriger vers dashboard après 2 secondes
         setTimeout(() => {
           this.router.navigate(['/dashboard']);
@@ -77,5 +100,15 @@ export class PurchaseComponent implements OnInit {
         this.loading = false;
       }
     });
+  }
+
+  // ✅ MÉTHODE HELPER pour formater le prix
+  formatPrice(price: number): string {
+    return `${price}€`;
+  }
+
+  // ✅ MÉTHODE HELPER pour formater le prix par crédit
+  formatPricePerCredit(pricePerCredit: number): string {
+    return `${pricePerCredit.toFixed(3)}€ / crédit`;
   }
 }

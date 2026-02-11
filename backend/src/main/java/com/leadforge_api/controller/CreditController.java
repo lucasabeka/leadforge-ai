@@ -48,14 +48,39 @@ public class CreditController {
                 return ResponseEntity.badRequest().body("Montant invalide");
             }
 
-            // Pour l'instant, on ajoute directement les crédits
-            // Plus tard, vous intégrerez Stripe ici
             user.setCredits(user.getCredits() + amount);
             userRepository.save(user);
 
             Map<String, Object> response = new HashMap<>();
             response.put("credits", user.getCredits());
             response.put("purchased", amount);
+
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
+    @PostMapping("/demo-purchase")
+    public ResponseEntity<?> demoPurchase(
+            @RequestBody Map<String, Integer> request,
+            @RequestHeader("Authorization") String authHeader
+    ) {
+        try {
+            User user = getUserFromToken(authHeader);
+            Integer credits = request.get("credits");
+
+            if (credits == null || credits <= 0) {
+                return ResponseEntity.badRequest().body("Montant invalide");
+            }
+
+            user.setCredits(user.getCredits() + credits);
+            userRepository.save(user);
+
+            Map<String, Object> response = new HashMap<>();
+            response.put("credits", user.getCredits());
+            response.put("purchased", credits);
+            response.put("demo", true);
 
             return ResponseEntity.ok(response);
         } catch (Exception e) {
