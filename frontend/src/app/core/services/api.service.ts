@@ -9,28 +9,38 @@ import { environment } from '../../../environments/environment';
 export class ApiService {
   private apiUrl = environment.apiUrl;
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient) {
+    console.log('🔍 API Service URL:', this.apiUrl); // Debug
+  }
 
   get<T>(endpoint: string): Observable<T> {
-    return this.http.get<T>(`${this.apiUrl}/${endpoint}`, {
+    const url = `${this.apiUrl}/${endpoint}`;
+    console.log('🔍 GET:', url); // Debug
+    return this.http.get<T>(url, {
       headers: this.getHeaders()
     });
   }
 
   post<T>(endpoint: string, data: any): Observable<T> {
-    return this.http.post<T>(`${this.apiUrl}/${endpoint}`, data, {
+    const url = `${this.apiUrl}/${endpoint}`;
+    console.log('🔍 POST:', url); // Debug
+    return this.http.post<T>(url, data, {
       headers: this.getHeaders()
     });
   }
 
   put<T>(endpoint: string, data: any): Observable<T> {
-    return this.http.put<T>(`${this.apiUrl}/${endpoint}`, data, {
+    const url = `${this.apiUrl}/${endpoint}`;
+    console.log('🔍 PUT:', url); // Debug
+    return this.http.put<T>(url, data, {
       headers: this.getHeaders()
     });
   }
 
   delete<T>(endpoint: string): Observable<T> {
-    return this.http.delete<T>(`${this.apiUrl}/${endpoint}`, {
+    const url = `${this.apiUrl}/${endpoint}`;
+    console.log('🔍 DELETE:', url); // Debug
+    return this.http.delete<T>(url, {
       headers: this.getHeaders()
     });
   }
