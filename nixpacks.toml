@@ -1,0 +1,10 @@
+[phases.setup]
+nixPkgs = ["maven", "jdk21"]
+
+[phases.build]
+cmds = [
+  "cd backend && mvn clean package -DskipTests"
+]
+
+[start]
+cmd = "cd backend && java -Dserver.port=$PORT -jar target/leadforge-api-0.0.1-SNAPSHOT.jar"
