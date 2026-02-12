@@ -69,7 +69,7 @@ export class PurchaseComponent implements OnInit {
         // Rediriger vers dashboard après 2 secondes
         setTimeout(() => {
           this.router.navigate(['/dashboard']);
-        }, 2000);
+        }, 1500);
       },
       error: (err) => {
         console.error('Error purchasing credits:', err);
