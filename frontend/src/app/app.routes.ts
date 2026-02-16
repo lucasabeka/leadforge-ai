@@ -37,13 +37,13 @@ export const routes: Routes = [
     canActivate: [authGuard, refreshUserGuard]  // ✅ Rafraîchit les crédits
   },
   {
-    path: '**',
-    redirectTo: '/login'
-  },
-  {
     path: 'purchase/success',
     loadComponent: () => import('./features/credits/purchase/success/success.component')
       .then(m => m.PurchaseSuccessComponent),
     canActivate: [authGuard]
+  },
+  {
+    path: '**',
+    redirectTo: '/login'
   }
 ];
