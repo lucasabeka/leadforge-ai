@@ -33,16 +33,6 @@
 .icon {
   font-size: 5rem;
   margin-bottom: 1.5rem;
-  animation: bounce 1s ease infinite;
-}
-
-@keyframes bounce {
-  0%, 100% {
-    transform: translateY(0);
-  }
-  50% {
-    transform: translateY(-10px);
-  }
 }
 
 h1 {
@@ -57,7 +47,6 @@ h1 {
   font-weight: bold;
   color: #10b981;
   margin: 1.5rem 0;
-  text-shadow: 0 2px 4px rgba(16, 185, 129, 0.2);
 }
 
 .balance {
@@ -84,7 +73,7 @@ h1 {
 }
 
 .subtext {
-  color: #9ca3af;
+  color: white;
   font-size: 0.9rem;
   margin-top: 0.5rem;
 }
@@ -111,44 +100,26 @@ h1 {
   border: none;
   font-size: 1rem;
   transition: all 0.3s ease;
-  text-decoration: none;
-  display: inline-block;
 
   &:hover {
     transform: translateY(-2px);
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-  }
-
-  &:active {
-    transform: translateY(0);
   }
 }
 
 .btn-primary {
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   color: white;
-
-  &:hover {
-    background: linear-gradient(135deg, #5568d3 0%, #653a8b 100%);
-  }
 }
 
 .btn-secondary {
   background: #3b82f6;
   color: white;
-
-  &:hover {
-    background: #2563eb;
-  }
 }
 
 .btn-tertiary {
   background: #e5e7eb;
   color: #374151;
-
-  &:hover {
-    background: #d1d5db;
-  }
 }
 
 .loading {
@@ -173,34 +144,6 @@ h1 {
 }
 
 @keyframes spin {
-  0% {
-    transform: rotate(0deg);
-  }
-  100% {
-    transform: rotate(360deg);
-  }
-}
-
-// Responsive
-@media (max-width: 640px) {
-  .success-container {
-    padding: 1rem;
-  }
-
-  .success-card,
-  .error-card {
-    padding: 2rem 1.5rem;
-  }
-
-  h1 {
-    font-size: 1.5rem;
-  }
-
-  .credits {
-    font-size: 1.5rem;
-  }
-
-  .icon {
-    font-size: 4rem;
-  }
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
 }

@@ -1,8 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
-import { CreditService } from '../../../core/services/credit.service';
-import { AuthService } from '../../../core/services/auth.service';
+import { CreditService } from '../../../../core/services/credit.service';
+import { AuthService } from '../../../../core/services/auth.service';
 
 @Component({
   selector: 'app-purchase-success',
@@ -42,9 +42,6 @@ export class PurchaseSuccessComponent implements OnInit {
         this.success = true;
         this.purchasedCredits = response.purchased;
         this.currentCredits = response.credits;
-
-        // Rafraîchir les données utilisateur
-        this.authService.refreshCurrentUser().subscribe();
 
         this.loading = false;
       },
