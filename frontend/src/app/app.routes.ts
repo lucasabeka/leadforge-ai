@@ -42,7 +42,7 @@ export const routes: Routes = [
   },
   {
     path: 'purchase/success',
-    loadComponent: () => import('./features/purchase/success/success.component')
+    loadComponent: () => import('./features/credits/purchase/success/success.component')
       .then(m => m.PurchaseSuccessComponent),
     canActivate: [authGuard]
   }
