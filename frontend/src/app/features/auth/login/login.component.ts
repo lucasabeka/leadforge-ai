@@ -44,4 +44,7 @@ export class LoginComponent {
       }
     });
   }
+  loginWithGoogle() {
+    window.location.href = 'https://leadforge-api-production-production.up.railway.app/api/auth/google/login';
+  }
 }

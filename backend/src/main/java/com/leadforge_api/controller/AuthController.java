@@ -41,7 +41,7 @@ public class AuthController {
         user.setEmail(request.getEmail());
         user.setPassword(passwordEncoder.encode(request.getPassword()));
         user.setName(request.getName());
-        user.setCredits(10); // 10 crédits gratuits à l'inscription
+        user.setCredits(25); // 25 crédits gratuits à l'inscription
         user.setCreatedAt(LocalDateTime.now());
 
         user = userRepository.save(user);

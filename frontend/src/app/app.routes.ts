@@ -36,11 +36,16 @@ export const routes: Routes = [
     loadComponent: () => import('./features/credits/purchase/purchase.component').then(m => m.PurchaseComponent),
     canActivate: [authGuard, refreshUserGuard]  // ✅ Rafraîchit les crédits
   },
-  {
-    path: 'purchase/success',
-    loadComponent: () => import('./features/credits/purchase/success/success.component')
-      .then(m => m.PurchaseSuccessComponent),
-    canActivate: [authGuard]
+    {
+      path: 'purchase/success',
+      loadComponent: () => import('./features/credits/purchase/success/success.component')
+        .then(m => m.PurchaseSuccessComponent),
+      canActivate: [authGuard]
+    },
+    {
+    path: 'auth/callback',
+    loadComponent: () => import('./features/auth/callback/callback.component')
+      .then(m => m.AuthCallbackComponent)
   },
   {
     path: '**',

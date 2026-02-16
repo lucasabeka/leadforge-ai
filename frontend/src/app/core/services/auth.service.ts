@@ -1,14 +1,23 @@
 import { Injectable } from '@angular/core';
-import { BehaviorSubject, Observable, throwError } from 'rxjs';
-import { tap, catchError } from 'rxjs/operators';
-import { ApiService } from './api.service';  // ← Utiliser ApiService
+import { Observable, BehaviorSubject } from 'rxjs';
+import { tap } from 'rxjs/operators';
+import { ApiService } from './api.service';
 
 export interface User {
-  id: number;
   email: string;
-  name: string;
+  name?: string;
   credits: number;
-  createdAt?: string;
+}
+
+export interface LoginCredentials {
+  email: string;
+  password: string;
+}
+
+export interface RegisterCredentials {
+  name: string;
+  email: string;
+  password: string;
 }
 
 @Injectable({
@@ -18,110 +27,69 @@ export class AuthService {
   private currentUserSubject = new BehaviorSubject<User | null>(null);
   public currentUser$ = this.currentUserSubject.asObservable();
 
-  constructor(private apiService: ApiService) {  // ← Injecter ApiService au lieu de HttpClient
-    this.loadUserFromStorage();
-  }
-
-  /**
-   * Charge l'utilisateur depuis le localStorage
-   */
-  private loadUserFromStorage(): void {
-    const storedUser = localStorage.getItem('user');
-    if (storedUser) {
+  constructor(private apiService: ApiService) {
+    // Charger l'utilisateur depuis localStorage au démarrage
+    const userStr = localStorage.getItem('user');
+    if (userStr) {
       try {
-        const user = JSON.parse(storedUser);
+        const user = JSON.parse(userStr);
         this.currentUserSubject.next(user);
         console.log('👤 Utilisateur chargé depuis le cache:', user.email);
-      } catch (error) {
-        console.error('Erreur lors du parsing de l\'utilisateur:', error);
+      } catch (e) {
+        console.error('❌ Erreur parsing user:', e);
         localStorage.removeItem('user');
       }
     }
   }
 
   /**
-   * MÉTHODE PRINCIPALE : Rafraîchit les données utilisateur depuis le serveur
+   * Récupère l'utilisateur depuis l'API
+   */
+  getCurrentUser(): Observable<User> {
+    console.log('🌐 Appel API pour récupérer l\'utilisateur...');
+    return this.apiService.get<User>('auth/me').pipe(
+      tap(user => {
+        console.log('✅ Utilisateur reçu:', user);
+        localStorage.setItem('user', JSON.stringify(user));
+        this.currentUserSubject.next(user);
+      })
+    );
+  }
+
+  /**
+   * Récupère l'utilisateur depuis le cache (synchrone)
+   */
+  getCurrentUserFromCache(): User | null {
+    return this.currentUserSubject.value;
+  }
+
+  /**
+   * Rafraîchit les données utilisateur depuis l'API
    */
   refreshCurrentUser(): Observable<User> {
-    console.log('🌐 Appel API pour rafraîchir l\'utilisateur...');
-
-    return this.apiService.get<User>('auth/me').pipe(  // ✅ Utilise apiService.get()
-      tap(user => {
-        console.log('✅ Données utilisateur reçues:', {
-          email: user.email,
-          credits: user.credits
-        });
-
-        this.currentUserSubject.next(user);
-        localStorage.setItem('user', JSON.stringify(user));
-      }),
-      catchError(error => {
-        console.error('❌ Erreur lors du rafraîchissement:', error);
-        return throwError(() => error);
-      })
-    );
+    console.log('🔄 Rafraîchissement utilisateur...');
+    return this.getCurrentUser();
   }
 
   /**
-   * Met à jour manuellement l'utilisateur
+   * Vérifie si l'utilisateur est connecté
    */
-  updateCurrentUser(user: User): void {
-    console.log('📝 Mise à jour manuelle de l\'utilisateur');
-    this.currentUserSubject.next(user);
-    localStorage.setItem('user', JSON.stringify(user));
+  isLoggedIn(): boolean {
+    return !!localStorage.getItem('token');
   }
 
   /**
-   * Met à jour uniquement les crédits
+   * Vérifie si l'utilisateur est authentifié (alias pour authGuard)
    */
-  updateCredits(credits: number): void {
-    const currentUser = this.currentUserSubject.value;
-    if (currentUser) {
-      const updatedUser = { ...currentUser, credits };
-      console.log('💰 Mise à jour des crédits:', credits);
-      this.currentUserSubject.next(updatedUser);
-      localStorage.setItem('user', JSON.stringify(updatedUser));
-    }
+  isAuthenticated(): boolean {
+    return this.isLoggedIn();
   }
 
   /**
-   * Connexion
+   * Récupère le token JWT
    */
-  login(credentials: { email: string; password: string }): Observable<any> {
-    return this.apiService.post('auth/login', credentials).pipe(  // ✅ Utilise apiService.post()
-      tap((response: any) => {
-        if (response.user) {
-          this.currentUserSubject.next(response.user);
-          localStorage.setItem('user', JSON.stringify(response.user));
-        }
-        if (response.token) {
-          localStorage.setItem('token', response.token);
-        }
-        console.log('✅ Connexion réussie');
-      }),
-      catchError(error => {
-        console.error('❌ Erreur de connexion:', error);
-        return throwError(() => error);
-      })
-    );
-  }
-
-  /**
-   * Inscription
-   */
-  register(userData: { email: string; password: string; name: string }): Observable<any> {
-    return this.apiService.post('auth/register', userData).pipe(  // ✅ Utilise apiService.post()
-      tap((response: any) => {
-        if (response.user) {
-          this.currentUserSubject.next(response.user);
-          localStorage.setItem('user', JSON.stringify(response.user));
-        }
-        if (response.token) {
-          localStorage.setItem('token', response.token);
-        }
-        console.log('✅ Inscription réussie');
-      })
-    );
+  getToken(): string | null {
+    return localStorage.getItem('token');
   }
 
   /**
@@ -129,37 +97,69 @@ export class AuthService {
    */
   logout(): void {
     console.log('👋 Déconnexion');
-    this.currentUserSubject.next(null);
-    localStorage.removeItem('user');
     localStorage.removeItem('token');
+    localStorage.removeItem('user');
+    this.currentUserSubject.next(null);
   }
 
   /**
-   * Obtient l'utilisateur actuel (valeur instantanée)
+   * Login avec credentials object OU paramètres séparés
    */
-  getCurrentUser(): User | null {
-    return this.currentUserSubject.value;
+  login(credentialsOrEmail: LoginCredentials | string, password?: string): Observable<any> {
+    let email: string;
+    let pwd: string;
+
+    // Support pour les deux signatures
+    if (typeof credentialsOrEmail === 'string') {
+      email = credentialsOrEmail;
+      pwd = password!;
+    } else {
+      email = credentialsOrEmail.email;
+      pwd = credentialsOrEmail.password;
+    }
+
+    return this.apiService.post('auth/login', { email, password: pwd }).pipe(
+      tap((response: any) => {
+        if (response.token) {
+          localStorage.setItem('token', response.token);
+          if (response.user) {
+            localStorage.setItem('user', JSON.stringify(response.user));
+            this.currentUserSubject.next(response.user);
+          }
+        }
+      })
+    );
   }
 
   /**
-   * Vérifie si l'utilisateur est connecté
+   * Register avec credentials object OU paramètres séparés
    */
-  isAuthenticated(): boolean {
-    return this.currentUserSubject.value !== null && this.hasValidToken();
-  }
+  register(credentialsOrName: RegisterCredentials | string, email?: string, password?: string): Observable<any> {
+    let name: string;
+    let userEmail: string;
+    let pwd: string;
 
-  /**
-   * Vérifie si le token est présent
-   */
-  private hasValidToken(): boolean {
-    const token = localStorage.getItem('token');
-    return !!token;
-  }
+    // Support pour les deux signatures
+    if (typeof credentialsOrName === 'string') {
+      name = credentialsOrName;
+      userEmail = email!;
+      pwd = password!;
+    } else {
+      name = credentialsOrName.name;
+      userEmail = credentialsOrName.email;
+      pwd = credentialsOrName.password;
+    }
 
-  /**
-   * Obtient le token d'authentification
-   */
-  getToken(): string | null {
-    return localStorage.getItem('token');
+    return this.apiService.post('auth/register', { name, email: userEmail, password: pwd }).pipe(
+      tap((response: any) => {
+        if (response.token) {
+          localStorage.setItem('token', response.token);
+          if (response.user) {
+            localStorage.setItem('user', JSON.stringify(response.user));
+            this.currentUserSubject.next(response.user);
+          }
+        }
+      })
+    );
   }
 }
