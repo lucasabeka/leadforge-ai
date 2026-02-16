@@ -16,7 +16,6 @@ import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import java.util.Arrays;
-import java.util.List;
 
 @Configuration
 @EnableWebSecurity
@@ -44,15 +43,15 @@ public class SecurityConfig {
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
 
-        // ✅ UTILISER allowedOriginPatterns au lieu de allowedOrigins
-        configuration.setAllowedOriginPatterns(List.of(
+        // ✅ CORRECTION CORS : utiliser allowedOriginPatterns
+        configuration.setAllowedOriginPatterns(Arrays.asList(
                 "http://localhost:4200",
                 "https://leadforge-ai-ijtw.vercel.app",
                 "https://*.vercel.app"
         ));
 
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
-        configuration.setAllowedHeaders(List.of("*"));
+        configuration.setAllowedHeaders(Arrays.asList("*"));
         configuration.setAllowCredentials(true);
         configuration.setMaxAge(3600L);
 
