@@ -39,5 +39,11 @@ export const routes: Routes = [
   {
     path: '**',
     redirectTo: '/login'
+  },
+  {
+    path: 'purchase/success',
+    loadComponent: () => import('./features/purchase/success/success.component')
+      .then(m => m.PurchaseSuccessComponent),
+    canActivate: [authGuard]
   }
 ];

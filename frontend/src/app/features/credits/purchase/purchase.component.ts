@@ -15,14 +15,13 @@ import { AuthService } from '../../../core/services/auth.service';
 export class PurchaseComponent implements OnInit {
   currentCredits = 0;
   loading = false;
-  successMessage = '';
   errorMessage = '';
 
   packages = [
-    { credits: 100, price: 10, popular: false },
-    { credits: 500, price: 40, popular: true, savings: '20%' },
-    { credits: 1000, price: 70, popular: false, savings: '30%' },
-    { credits: 5000, price: 300, popular: false, savings: '40%' }
+    { credits: 100, price: 19, popular: false },
+    { credits: 500, price: 79, popular: true, savings: '17%' },
+    { credits: 1000, price: 139, popular: false, savings: '30%' },
+    { credits: 5000, price: 599, popular: false, savings: '40%' }
   ];
 
   constructor(
@@ -46,34 +45,27 @@ export class PurchaseComponent implements OnInit {
     });
   }
 
-  purchasePackage(amount: number, price: number) {
+  purchasePackage(credits: number, price: number) {
     this.loading = true;
-    this.successMessage = '';
     this.errorMessage = '';
 
-    // Pour l'instant, on ajoute directement les crédits
-    // Plus tard, vous intégrerez le paiement Stripe ici
-    this.creditService.purchaseCredits(amount).subscribe({
+    console.log('🔄 Création session Stripe...', { credits, price });
+
+    this.creditService.createCheckoutSession(credits, price).subscribe({
       next: (response) => {
-        this.currentCredits = response.credits;
-        this.successMessage = `${response.purchased} crédits ajoutés avec succès !`;
-        this.loading = false;
+        console.log('✅ Session créée:', response);
 
-        // Mettre à jour le user dans AuthService
-        const user = this.authService.getCurrentUser();
-        if (user) {
-          user.credits = response.credits;
-          localStorage.setItem('user', JSON.stringify(user));
+        // Rediriger vers Stripe Checkout
+        if (response.url) {
+          window.location.href = response.url;
+        } else {
+          this.errorMessage = 'URL de paiement manquante';
+          this.loading = false;
         }
-
-        // Rediriger vers dashboard après 2 secondes
-        setTimeout(() => {
-          this.router.navigate(['/dashboard']);
-        }, 1500);
       },
       error: (err) => {
-        console.error('Error purchasing credits:', err);
-        this.errorMessage = 'Erreur lors de l\'achat de crédits';
+        console.error('❌ Erreur création session:', err);
+        this.errorMessage = 'Erreur lors de la création du paiement';
         this.loading = false;
       }
     });

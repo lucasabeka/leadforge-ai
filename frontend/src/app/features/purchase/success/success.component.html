@@ -1,0 +1,44 @@
+<div class="success-container">
+  <!-- Succès -->
+  <div class="success-card" *ngIf="!loading && success">
+    <div class="icon">✅</div>
+    <h1>Paiement réussi !</h1>
+    <p class="credits">+{{ purchasedCredits }} crédits ajoutés</p>
+    <p class="balance">Nouveau solde : <strong>{{ currentCredits }} crédits</strong></p>
+
+    <div class="actions">
+      <button class="btn-primary" routerLink="/dashboard">
+        Retour au dashboard
+      </button>
+      <button class="btn-secondary" routerLink="/campaigns/new">
+        Créer une campagne
+      </button>
+    </div>
+  </div>
+
+  <!-- Erreur -->
+  <div class="error-card" *ngIf="!loading && !success">
+    <div class="icon">❌</div>
+    <h1>Erreur de paiement</h1>
+    <p class="error-message">{{ errorMessage }}</p>
+    <p class="help-text">
+      Si le problème persiste, contactez-nous à support@leadforge.app
+    </p>
+
+    <div class="actions">
+      <button class="btn-secondary" routerLink="/purchase">
+        Réessayer
+      </button>
+      <button class="btn-tertiary" routerLink="/dashboard">
+        Retour au dashboard
+      </button>
+    </div>
+  </div>
+
+  <!-- Loading -->
+  <div class="loading" *ngIf="loading">
+    <div class="spinner"></div>
+    <p>Vérification du paiement...</p>
+    <p class="subtext">Veuillez patienter quelques instants</p>
+  </div>
+</div>
