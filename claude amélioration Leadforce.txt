@@ -1,0 +1,39 @@
+ Critique                                                                                                                                                                            
+                                                                                                                                                                                        
+    - Token JWT stocké en localStorage — Vulnérable au XSS. Préférer un cookie HttpOnly + Secure géré côté serveur, ou au minimum un mécanisme de rotation.                             
+    - Pas d'intercepteur HTTP global — Chaque service construit ses headers manuellement. Un HttpInterceptor centraliserait l'ajout du token et la gestion des 401 (redirect vers       
+    login).
+    - Aucune gestion des erreurs UI — Si une API call échoue, rien n'est affiché à l'utilisateur dans la plupart des cas.
+
+    Important
+
+    - Pas de lazy loading réel — Les routes sont déclarées mais vérifier que le bundling est bien séparé par feature. ng build --stats-json + webpack-bundle-analyzer pour valider.
+    - Polling toutes les 5s — Remplacer par SSE (Server-Sent Events) ou WebSocket pour que le backend pousse le statut dès qu'il change. Moins de charge, UX plus fluide.
+    - Formulaire de création sans validation UI — numberOfProspects avec un simple slider mais pas de vérification que l'utilisateur a assez de crédits avant soumission (seulement côté
+     backend).
+    - Pas de state management — Pour l'instant ça tient avec des services simples, mais dès qu'on ajoute des features, passer à NgRx Signal Store ou Akita.
+
+    Moyen terme
+
+    - PWA / offline — Service worker pour mettre en cache la coquille de l'app.
+    - Accessibilité (a11y) — Ajouter aria-label, role, navigation clavier sur les modales et chips.
+    - i18n — Le code mélange français et anglais (labels UI en français, code en anglais). Choisir une langue et s'y tenir, ou utiliser @angular/localize.
+
+    ---
+    Infrastructure / DevOps
+
+    - Docker Compose — Un docker-compose.yml avec backend + frontend + PostgreSQL permettrait de lancer l'app en une commande.
+    - Variables d'environnement — Le .env à la racine avec de vraies clés ne devrait jamais exister dans un repo git. Utiliser un secret manager (Vault, AWS Secrets Manager, Doppler).
+    - CI/CD — Aucun pipeline. GitHub Actions avec build + tests + lint bloquants sur les PRs.
+    - HTTPS en local — Pour tester OAuth Google correctement sans contournements.
+
+    ---
+    Priorité recommandée
+
+    1. PostgreSQL + Flyway (données persistantes)
+    2. Webhook Stripe (crédits fiables)
+    3. @ControllerAdvice + validation @Valid
+    4. HttpInterceptor Angular
+    5. Tests d'intégration backend
+    6. Vraie source de données prospects
+

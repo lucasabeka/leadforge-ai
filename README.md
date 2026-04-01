@@ -33,14 +33,14 @@ Générez automatiquement des prospects qualifiés et des emails de prospection 
 
 **Backend**
 - Java 17
-- Spring Boot 3.2 (Web, Security, Data JPA)
+- Spring Boot 4.0 (Web, Security, Data JPA)
 - Spring Security avec JWT
-- PostgreSQL / H2
+- PostgreSQL + Flyway
 - Maven
 
 **Frontend**
-- Angular 17 (Standalone Components)
-- TypeScript 5.0
+- Angular 18 (Standalone Components)
+- TypeScript 5.4
 - RxJS pour programmation réactive
 - SCSS pour styling
 
@@ -69,40 +69,66 @@ Générez automatiquement des prospects qualifiés et des emails de prospection 
 
 ---
 
-## 🚀 Installation & Démarrage
+## ⚡ Démarrage Rapide (Docker)
+
+### Prérequis
+- [Docker](https://docs.docker.com/get-docker/) + Docker Compose
+- Node.js 18+ (pour le frontend uniquement)
+
+### 1. Configurer les variables d'environnement
+```bash
+cp .env.example .env
+# Éditez .env avec vos vraies clés API
+```
+
+### 2. Lancer la base de données + le backend
+```bash
+docker-compose up --build
+```
+
+- API disponible sur **http://localhost:8080**
+- PostgreSQL disponible sur **localhost:5432**
+
+### 3. Lancer le frontend
+```bash
+cd frontend
+npm install
+ng serve
+```
+
+Application disponible sur **http://localhost:4200**
+
+---
+
+## 🚀 Installation Manuelle
 
 ### Prérequis
 - Java 17+
 - Node.js 18+
 - Maven 3.8+
-- PostgreSQL 14+ (optionnel, H2 par défaut)
+- PostgreSQL 15+ (via Docker : `docker-compose up db`)
 
 ### Backend (API)
 ```bash
 cd backend
 
-# Configuration (optionnel)
-cp src/main/resources/application.properties.example src/main/resources/application.properties
-# Éditez avec vos clés API si nécessaire
+# Démarrez PostgreSQL d'abord
+docker-compose up db -d
 
-# Lancer
+# Copiez et remplissez vos variables d'environnement
+cp .env.example .env
+
+# Lancer (charge le .env automatiquement si vous utilisez un plugin dotenv,
+# sinon exportez les variables manuellement)
 ./mvnw spring-boot:run
 ```
 
-API disponible sur **http://localhost:8080**
-
-### Frontend (Interface)
+### Frontend
 ```bash
 cd frontend
-
-# Installation
 npm install
-
-# Lancer
 ng serve
 ```
-
-Application disponible sur **http://localhost:4200**
 
 ---
 
@@ -246,19 +272,18 @@ vercel --prod
 ## 🛣️ Roadmap
 
 ### ✅ Version 1.0 (Actuelle)
-- [x] Authentification JWT
-- [x] Création de campagnes
-- [x] Génération de prospects mockés
-- [x] Emails générés par template
-- [x] Système de crédits
+- [x] Authentification JWT + Google OAuth
+- [x] Création de campagnes avec validation
+- [x] Génération de prospects
+- [x] Emails ultra-personnalisés par Claude AI
+- [x] Système de crédits + paiement Stripe
 - [x] Dashboard analytics
 - [x] Export CSV
 
 ### 🚧 Version 1.1 (En cours)
-- [ ] Intégration Claude API pour emails ultra-personnalisés
 - [ ] Connexion APIs réelles (Apollo.io, Hunter.io)
-- [ ] Paiement Stripe
 - [ ] Envoi automatique d'emails
+- [ ] Templates d'emails personnalisables
 
 ### 🔮 Version 2.0 (Futur)
 - [ ] Intégration LinkedIn

@@ -34,7 +34,7 @@ export class AuthCallbackComponent implements OnInit {
     localStorage.setItem('token', token);
 
     // Récupérer les infos utilisateur depuis l'API
-    this.authService.getCurrentUser().subscribe({
+    this.authService.refreshCurrentUser().subscribe({
       next: (user) => {
         console.log('✅ Utilisateur connecté via Google:', user.email);
         this.router.navigate(['/dashboard']);

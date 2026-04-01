@@ -6,6 +6,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -28,9 +30,10 @@ public class GoogleAuthService {
      * Génère l'URL de redirection Google OAuth
      */
     public String getAuthorizationUrl() {
+        String encodedRedirectUri = URLEncoder.encode(redirectUri, StandardCharsets.UTF_8);
         return "https://accounts.google.com/o/oauth2/v2/auth?" +
                 "client_id=" + clientId +
-                "&redirect_uri=" + redirectUri +
+                "&redirect_uri=" + encodedRedirectUri +
                 "&response_type=code" +
                 "&scope=openid%20email%20profile" +
                 "&access_type=offline" +

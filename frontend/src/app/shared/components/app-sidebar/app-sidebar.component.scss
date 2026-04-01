@@ -1,0 +1,99 @@
+:host { display: contents; }
+
+.lf-sidebar {
+  width: 240px;
+  background: var(--lf-dark);
+  display: flex;
+  flex-direction: column;
+  padding: 1.5rem 0;
+  position: fixed;
+  top: 0; left: 0;
+  height: 100vh;
+  z-index: 100;
+  transition: transform 0.3s ease;
+
+  @media (max-width: 991px) {
+    transform: translateX(-100%);
+    &.open { transform: translateX(0); }
+  }
+}
+
+.sidebar-logo {
+  padding: 0 1.5rem 1.5rem;
+  border-bottom: 1px solid rgba(255,255,255,0.08);
+  font-weight: 700;
+  font-size: 1.1rem;
+  color: white;
+}
+
+.sidebar-nav {
+  flex: 1;
+  padding: 1rem 0;
+
+  .nav-item { list-style: none; }
+
+  .nav-link {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.7rem 1.5rem;
+    color: rgba(255,255,255,0.55);
+    font-size: 0.9rem;
+    font-weight: 500;
+    text-decoration: none;
+    transition: all 0.2s;
+    border-left: 3px solid transparent;
+
+    .nav-icon { font-size: 1.1rem; width: 20px; text-align: center; }
+
+    &:hover { color: rgba(255,255,255,0.9); background: rgba(255,255,255,0.05); }
+    &.active { color: white; background: rgba(5,150,105,0.2); border-left-color: var(--lf-primary); }
+  }
+}
+
+.sidebar-footer {
+  padding: 1rem 1.5rem;
+  border-top: 1px solid rgba(255,255,255,0.08);
+}
+
+.credits-badge {
+  background: rgba(5,150,105,0.15);
+  border: 1px solid rgba(5,150,105,0.3);
+  border-radius: 8px;
+  padding: 0.75rem;
+  text-align: center;
+  margin-bottom: 0.75rem;
+
+  .credits-number { font-size: 1.4rem; font-weight: 700; color: #34d399; }
+  .credits-label  { font-size: 0.72rem; color: rgba(255,255,255,0.4); }
+}
+
+.user-info {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+
+  .user-avatar {
+    width: 32px; height: 32px;
+    border-radius: 50%;
+    background: var(--lf-primary);
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 700; font-size: 0.8rem; color: white;
+    flex-shrink: 0;
+  }
+
+  .user-email {
+    font-size: 0.75rem;
+    color: rgba(255,255,255,0.5);
+    flex: 1;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  }
+
+  .btn-logout {
+    background: none; border: none;
+    color: rgba(255,255,255,0.3);
+    cursor: pointer; padding: 0; font-size: 1rem;
+    transition: color 0.2s;
+    &:hover { color: rgba(255,255,255,0.7); }
+  }
+}

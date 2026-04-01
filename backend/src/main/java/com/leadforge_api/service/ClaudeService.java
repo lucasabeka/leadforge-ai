@@ -35,35 +35,65 @@ public class ClaudeService {
                 prospectName, prospectCompany, prospectJobTitle,
                 prospectLocation, industry, companySize, painPoint
         );
+        try {
+            return callClaudeApi(prompt, 1500);
+        } catch (Exception e) {
+            System.err.println("Erreur Claude API: " + e.getMessage());
+            return generateFallbackEmail(prospectName, prospectCompany, painPoint);
+        }
+    }
 
+    public String generateEmailSubject(String company, String painPoint) {
+        String prompt = String.format("""
+            Génère un objet d'email de prospection B2B percutant.
+
+            Entreprise cible : %s
+            Pain point : %s
+
+            Consignes :
+            - Maximum 60 caractères
+            - Pas de questions
+            - Pas de "Re:" ou "Fwd:"
+            - Crée de la curiosité
+            - Personnalisé à l'entreprise
+
+            Réponds UNIQUEMENT avec l'objet, rien d'autre.
+            """,
+                company, painPoint
+        );
+        try {
+            return callClaudeApi(prompt, 100).trim();
+        } catch (Exception e) {
+            return company + " - Opportunité de collaboration";
+        }
+    }
+
+    @SuppressWarnings("unchecked")
+    private String callClaudeApi(String prompt, int maxTokens) {
         Map<String, Object> requestBody = Map.of(
                 "model", "claude-haiku-4-5-20251001",
-                "max_tokens", 1500,
+                "max_tokens", maxTokens,
                 "messages", List.of(
                         Map.of("role", "user", "content", prompt)
                 )
         );
 
-        try {
-            Map<String, Object> response = webClient.post()
-                    .uri("/messages")
-                    .header("x-api-key", apiKey)
-                    .header("anthropic-version", "2023-06-01")
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .bodyValue(requestBody)
-                    .retrieve()
-                    .bodyToMono(Map.class)
-                    .block();
+        Map<String, Object> response = webClient.post()
+                .uri("/messages")
+                .header("x-api-key", apiKey)
+                .header("anthropic-version", "2023-06-01")
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(requestBody)
+                .retrieve()
+                .bodyToMono(Map.class)
+                .block();
 
-            List<Map<String, Object>> content =
-                    (List<Map<String, Object>>) response.get("content");
-
-            return (String) content.get(0).get("text");
-
-        } catch (Exception e) {
-            System.err.println("Erreur Claude API: " + e.getMessage());
-            return generateFallbackEmail(prospectName, prospectCompany, painPoint);
+        if (response == null || !response.containsKey("content")) {
+            throw new RuntimeException("Réponse Claude vide ou invalide");
         }
+
+        List<Map<String, Object>> content = (List<Map<String, Object>>) response.get("content");
+        return (String) content.get(0).get("text");
     }
 
     private String buildPrompt(
@@ -72,7 +102,7 @@ public class ClaudeService {
     ) {
         return String.format("""
             Tu es un expert en prospection B2B. Génère un email de prospection ultra-personnalisé.
-            
+
             PROSPECT :
             - Nom : %s
             - Entreprise : %s
@@ -81,7 +111,7 @@ public class ClaudeService {
             - Industrie : %s
             - Taille : %s
             - Pain point identifié : %s
-            
+
             CONSIGNES STRICTES :
             1. Accroche : Mentionne un élément spécifique de l'entreprise
             2. Pain point : Identifie un challenge concret de leur industrie
@@ -90,7 +120,7 @@ public class ClaudeService {
             5. CTA : Proposition d'horaire précis OU question ouverte
             6. Ton : Conversationnel, direct, pas de corporate speak
             7. Longueur : 120-150 mots MAX
-            
+
             Format : Texte pur, pas de signature, pas de [NOM DE L'EXPÉDITEUR]
             """,
                 name, company, jobTitle, location, industry, companySize, painPoint
@@ -100,65 +130,17 @@ public class ClaudeService {
     private String generateFallbackEmail(String name, String company, String painPoint) {
         return String.format("""
             Bonjour %s,
-            
+
             Je travaille avec des entreprises comme %s pour résoudre %s.
-            
-            Nous avons aidé des clients similaires à obtenir des résultats mesurables 
+
+            Nous avons aidé des clients similaires à obtenir des résultats mesurables
             en automatisant leur prospection B2B.
-            
+
             Seriez-vous disponible pour un échange rapide de 15 minutes cette semaine ?
-            
+
             Cordialement
             """,
                 name, company, painPoint.toLowerCase()
         );
-    }
-
-    public String generateEmailSubject(String company, String painPoint) {
-        String prompt = String.format("""
-            Génère un objet d'email de prospection B2B percutant.
-            
-            Entreprise cible : %s
-            Pain point : %s
-            
-            Consignes :
-            - Maximum 60 caractères
-            - Pas de questions
-            - Pas de "Re:" ou "Fwd:"
-            - Crée de la curiosité
-            - Personnalisé à l'entreprise
-            
-            Réponds UNIQUEMENT avec l'objet, rien d'autre.
-            """,
-                company, painPoint
-        );
-
-        Map<String, Object> requestBody = Map.of(
-                "model", "claude-haiku-4-5-20251001",
-                "max_tokens", 100,
-                "messages", List.of(
-                        Map.of("role", "user", "content", prompt)
-                )
-        );
-
-        try {
-            Map<String, Object> response = webClient.post()
-                    .uri("/messages")
-                    .header("x-api-key", apiKey)
-                    .header("anthropic-version", "2023-06-01")
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .bodyValue(requestBody)
-                    .retrieve()
-                    .bodyToMono(Map.class)
-                    .block();
-
-            List<Map<String, Object>> content =
-                    (List<Map<String, Object>>) response.get("content");
-
-            return ((String) content.get(0).get("text")).trim();
-
-        } catch (Exception e) {
-            return company + " - Opportunité de collaboration";
-        }
     }
 }

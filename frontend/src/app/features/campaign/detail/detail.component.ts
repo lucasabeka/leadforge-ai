@@ -2,17 +2,19 @@ import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { CampaignService, Campaign, Prospect } from '../../../core/services/campaign.service';
+import { AuthService } from '../../../core/services/auth.service';
+import { AppSidebarComponent } from '../../../shared/components/app-sidebar/app-sidebar.component';
 import { interval, Subscription } from 'rxjs';
 import { FormsModule } from '@angular/forms';
 
 @Component({
   selector: 'app-detail',
   standalone: true,
-  imports: [CommonModule, RouterModule, FormsModule],
+  imports: [CommonModule, RouterModule, FormsModule, AppSidebarComponent],
   templateUrl: './detail.component.html',
   styleUrls: ['./detail.component.scss']
 })
-export class DetailComponent implements OnInit, OnDestroy {
+export class CampaignDetailComponent implements OnInit, OnDestroy {
   campaign?: Campaign;
   prospects: Prospect[] = [];
   filteredProspects: Prospect[] = [];
@@ -21,13 +23,14 @@ export class DetailComponent implements OnInit, OnDestroy {
   searchTerm = '';
   sortBy = 'score';
   loading = true;
+  copyFeedback = '';
 
   private pollingSubscription?: Subscription;
 
   constructor(
     private route: ActivatedRoute,
     private router: Router,
-    private campaignService: CampaignService
+    private campaignService: CampaignService,
   ) {}
 
   ngOnInit() {
@@ -53,7 +56,10 @@ export class DetailComponent implements OnInit, OnDestroy {
         this.loading = false;
 
         if (campaign.status === 'COMPLETED') {
+          this.pollingSubscription?.unsubscribe();
           this.loadProspects(id);
+        } else if (campaign.status === 'FAILED') {
+          this.pollingSubscription?.unsubscribe();
         }
       },
       error: (err) => {
@@ -115,16 +121,19 @@ export class DetailComponent implements OnInit, OnDestroy {
 
   copyEmail(prospect: Prospect) {
     const text = `Sujet: ${prospect.emailSubject}\n\n${prospect.emailBody}`;
-    navigator.clipboard.writeText(text).then(() => {
-      alert('Email copié dans le presse-papiers !');
-    });
+    navigator.clipboard.writeText(text).then(() => this.showCopyFeedback('Email copié !'));
   }
 
   copyAllEmails() {
     const emails = this.prospects.map(p => p.email).join(', ');
-    navigator.clipboard.writeText(emails).then(() => {
-      alert(`${this.prospects.length} emails copiés !`);
-    });
+    navigator.clipboard.writeText(emails).then(() =>
+      this.showCopyFeedback(`${this.prospects.length} emails copiés !`)
+    );
+  }
+
+  private showCopyFeedback(message: string) {
+    this.copyFeedback = message;
+    setTimeout(() => this.copyFeedback = '', 2500);
   }
 
   exportCSV() {
@@ -161,6 +170,22 @@ export class DetailComponent implements OnInit, OnDestroy {
     const subject = encodeURIComponent(prospect.emailSubject);
     const body = encodeURIComponent(prospect.emailBody);
     return `mailto:${prospect.email}?subject=${subject}&body=${body}`;
+  }
+
+  getStatusClass(status: string): string {
+    const classes: Record<string, string> = {
+      'PENDING': 'status-pending',
+      'PROCESSING': 'status-processing',
+      'COMPLETED': 'status-completed',
+      'FAILED': 'status-failed'
+    };
+    return classes[status] || '';
+  }
+
+  getScoreClass(score: number): string {
+    if (score >= 90) return 'score-high';
+    if (score >= 70) return 'score-medium';
+    return 'score-low';
   }
 
   getStatusLabel(status: string): string {

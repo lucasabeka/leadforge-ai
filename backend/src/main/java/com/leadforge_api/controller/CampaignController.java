@@ -6,7 +6,7 @@ import com.leadforge_api.dto.ProspectDto;
 import com.leadforge_api.model.Campaign;
 import com.leadforge_api.model.User;
 import com.leadforge_api.repository.UserRepository;
-import com.leadforge_api.security.JwtUtil;
+import com.leadforge_api.security.TokenHelper;
 import com.leadforge_api.service.CampaignService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,7 +27,7 @@ public class CampaignController {
     private UserRepository userRepository;
 
     @Autowired
-    private JwtUtil jwtUtil;
+    private TokenHelper tokenHelper;
 
     @PostMapping
     public ResponseEntity<?> createCampaign(
@@ -35,19 +35,15 @@ public class CampaignController {
             @RequestHeader("Authorization") String authHeader
     ) {
         try {
-            User user = getUserFromToken(authHeader);
-
-            // Calculer le coût en crédits (1 crédit = 1 prospect)
+            User user = tokenHelper.getUserFromHeader(authHeader);
             int cost = request.getNumberOfProspects();
 
-            // Vérifier crédits
             if (user.getCredits() < cost) {
                 return ResponseEntity.status(402)
                         .body("Crédits insuffisants. Vous avez " + user.getCredits() +
                                 " crédits, mais " + cost + " sont nécessaires.");
             }
 
-            // Créer campagne
             Campaign campaign = new Campaign();
             campaign.setUser(user);
             campaign.setName(request.getName());
@@ -56,15 +52,13 @@ public class CampaignController {
             campaign.setLocation(request.getLocation());
             campaign.setJobTitle(request.getJobTitle());
             campaign.setPainPoint(request.getPainPoint());
-            campaign.setNumberOfProspects(request.getNumberOfProspects()); // NOUVEAU
+            campaign.setNumberOfProspects(request.getNumberOfProspects());
 
             campaign = campaignService.createCampaign(campaign);
 
-            // Déduire crédits
             user.setCredits(user.getCredits() - cost);
             userRepository.save(user);
 
-            // Lancer génération asynchrone
             Long campaignId = campaign.getId();
             campaignService.generateProspects(campaignId);
 
@@ -78,13 +72,10 @@ public class CampaignController {
     @GetMapping
     public ResponseEntity<?> listCampaigns(@RequestHeader("Authorization") String authHeader) {
         try {
-            User user = getUserFromToken(authHeader);
-            List<Campaign> campaigns = campaignService.getUserCampaigns(user);
-
-            List<CampaignDto> dtos = campaigns.stream()
+            User user = tokenHelper.getUserFromHeader(authHeader);
+            List<CampaignDto> dtos = campaignService.getUserCampaigns(user).stream()
                     .map(CampaignDto::fromCampaign)
                     .collect(Collectors.toList());
-
             return ResponseEntity.ok(dtos);
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(e.getMessage());
@@ -97,7 +88,7 @@ public class CampaignController {
             @RequestHeader("Authorization") String authHeader
     ) {
         try {
-            User user = getUserFromToken(authHeader);
+            User user = tokenHelper.getUserFromHeader(authHeader);
             Campaign campaign = campaignService.getCampaign(id, user);
             return ResponseEntity.ok(CampaignDto.fromCampaign(campaign));
         } catch (Exception e) {
@@ -111,7 +102,7 @@ public class CampaignController {
             @RequestHeader("Authorization") String authHeader
     ) {
         try {
-            User user = getUserFromToken(authHeader);
+            User user = tokenHelper.getUserFromHeader(authHeader);
             Campaign campaign = campaignService.getCampaign(id, user);
 
             List<ProspectDto> prospects = campaign.getProspects().stream()
@@ -122,12 +113,5 @@ public class CampaignController {
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
-    }
-
-    private User getUserFromToken(String authHeader) {
-        String token = authHeader.substring(7);
-        String email = jwtUtil.extractEmail(token);
-        return userRepository.findByEmail(email)
-                .orElseThrow(() -> new RuntimeException("User not found"));
     }
 }

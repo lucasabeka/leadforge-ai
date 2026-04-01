@@ -26,8 +26,7 @@ public class CampaignRequest {
     @NotBlank(message = "Le pain point est requis")
     private String painPoint;
 
-    // NOUVEAU : Nombre de prospects à générer
     @Min(value = 10, message = "Minimum 10 prospects")
     @Max(value = 200, message = "Maximum 200 prospects")
-    private Integer numberOfProspects = 50; // Valeur par défaut
+    private Integer numberOfProspects = 50;
 }

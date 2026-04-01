@@ -1,104 +1,50 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Router, RouterModule } from '@angular/router';
-import { Subject, takeUntil } from 'rxjs';
+import { RouterModule } from '@angular/router';
 import { AuthService } from '../../core/services/auth.service';
 import { CampaignService, Campaign } from '../../core/services/campaign.service';
+import { AppSidebarComponent } from '../../shared/components/app-sidebar/app-sidebar.component';
 
 @Component({
   selector: 'app-dashboard',
   standalone: true,
-  imports: [CommonModule, RouterModule],
+  imports: [CommonModule, RouterModule, AppSidebarComponent],
   templateUrl: './dashboard.component.html',
   styleUrls: ['./dashboard.component.scss']
 })
-export class DashboardComponent implements OnInit, OnDestroy {
+export class DashboardComponent implements OnInit {
   campaigns: Campaign[] = [];
   loading = true;
-  stats = {
-    campaigns: 0,
-    prospects: 0,
-    credits: 0
-  };
-
-  private destroy$ = new Subject<void>();
 
   constructor(
     private authService: AuthService,
     private campaignService: CampaignService,
-    private router: Router
   ) {}
 
-  get user$() {
-    return this.authService.currentUser$;
+  get credits(): number {
+    return this.authService.getCurrentUser()?.credits ?? 0;
+  }
+
+  get totalProspects(): number {
+    return this.campaigns.reduce((sum, c) => sum + (c.prospectsCount || 0), 0);
+  }
+
+  get completedCount(): number {
+    return this.campaigns.filter(c => c.status === 'COMPLETED').length;
   }
 
   ngOnInit() {
-    // Charger les données initiales
-    this.loadAllData();
-
-    // S'abonner aux changements de l'utilisateur
-    this.authService.currentUser$
-      .pipe(takeUntil(this.destroy$))
-      .subscribe(user => {
-        if (user) {
-          this.stats.credits = user.credits;
-        }
-      });
-  }
-
-  ngOnDestroy() {
-    this.destroy$.next();
-    this.destroy$.complete();
-  }
-
-  /**
-   * Charge toutes les données du dashboard
-   * Cette méthode est appelée à l'initialisation ET quand on revient sur la page
-   */
-  private loadAllData() {
-    // Rafraîchir les données utilisateur depuis le serveur
-    this.refreshUserData();
-
-    // Charger les campagnes
+    this.authService.refreshCurrentUser().subscribe({ error: () => {} });
     this.loadCampaigns();
-  }
-
-  /**
-   * Rafraîchit les données utilisateur depuis le serveur
-   */
-  private refreshUserData() {
-    // Si la méthode refreshCurrentUser existe dans AuthService
-    if (typeof this.authService.refreshCurrentUser === 'function') {
-      this.authService.refreshCurrentUser().subscribe({
-        next: (user) => {
-          if (user) {
-            this.stats.credits = user.credits;
-          }
-        },
-        error: (err) => {
-          console.error('Error refreshing user data:', err);
-        }
-      });
-    } else {
-      // Sinon, forcer une récupération via getCurrentUser ou similaire
-      // Cette partie dépend de votre implémentation d'AuthService
-      console.warn('refreshCurrentUser method not available in AuthService');
-    }
   }
 
   loadCampaigns() {
     this.campaignService.list().subscribe({
       next: (campaigns) => {
         this.campaigns = campaigns;
-        this.stats.campaigns = campaigns.length;
-        this.stats.prospects = campaigns.reduce((sum, c) => sum + (c.prospectsCount || 0), 0);
         this.loading = false;
       },
-      error: (err) => {
-        console.error('Error loading campaigns:', err);
-        this.loading = false;
-      }
+      error: () => { this.loading = false; }
     });
   }
 
@@ -112,8 +58,14 @@ export class DashboardComponent implements OnInit, OnDestroy {
     return labels[status] || status;
   }
 
-  logout() {
-    this.authService.logout();
-    this.router.navigate(['/login']);
+  getStatusClass(status: string): string {
+    const classes: Record<string, string> = {
+      'PENDING': 'status-pending',
+      'PROCESSING': 'status-processing',
+      'COMPLETED': 'status-completed',
+      'FAILED': 'status-failed'
+    };
+    return classes[status] || '';
   }
+
 }

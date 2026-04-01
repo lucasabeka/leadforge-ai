@@ -1,0 +1,210 @@
+<!-- LANDING PAGE -->
+<div class="landing-page">
+
+  <!-- NAVBAR -->
+  <nav class="navbar navbar-expand-lg fixed-top lf-navbar">
+    <div class="container">
+      <a class="navbar-brand lf-logo" routerLink="/">
+        <span class="logo-icon">⚡</span> LeadForge
+      </a>
+      <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navMenu">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navMenu">
+        <ul class="navbar-nav ms-auto align-items-center gap-2">
+          <li class="nav-item"><a class="nav-link" href="#features">Fonctionnalités</a></li>
+          <li class="nav-item"><a class="nav-link" href="#pricing">Tarifs</a></li>
+          <li class="nav-item">
+            <a class="btn btn-outline-light btn-sm px-3" routerLink="/login">Connexion</a>
+          </li>
+          <li class="nav-item">
+            <a class="btn btn-warning btn-sm px-3 fw-semibold" routerLink="/register">Essai gratuit</a>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+  <!-- HERO -->
+  <section class="lf-hero d-flex align-items-center">
+    <div class="container">
+      <div class="row align-items-center g-5">
+        <div class="col-lg-6">
+          <div class="hero-badge mb-3">
+            <span class="badge lf-badge-new">🚀 Nouveau</span>
+            <span class="ms-2 text-muted small">Conçu pour les devs freelance</span>
+          </div>
+          <h1 class="lf-hero-title">
+            Trouve tes clients<br>
+            <span class="text-highlight">sans passer des heures</span><br>
+            sur LinkedIn
+          </h1>
+          <p class="lf-hero-subtitle mt-3">
+            Tu fais du React, Node ou Flutter ? LeadForge génère des emails de prospection
+            ultra-personnalisés pour les startups et PME qui cherchent exactement ton profil.
+          </p>
+          <div class="d-flex flex-wrap gap-3 mt-4">
+            <a routerLink="/register" class="btn lf-btn-primary btn-lg">
+              Commencer gratuitement <span class="ms-1">→</span>
+            </a>
+            <a href="#demo" class="btn btn-outline-secondary btn-lg">
+              Voir une démo
+            </a>
+          </div>
+          <div class="hero-stats d-flex gap-4 mt-4">
+            <div class="stat-item">
+              <div class="stat-number">25</div>
+              <div class="stat-label">crédits offerts</div>
+            </div>
+            <div class="stat-divider"></div>
+            <div class="stat-item">
+              <div class="stat-number">~2min</div>
+              <div class="stat-label">pour lancer une campagne</div>
+            </div>
+            <div class="stat-divider"></div>
+            <div class="stat-item">
+              <div class="stat-number">IA</div>
+              <div class="stat-label">emails personnalisés</div>
+            </div>
+          </div>
+        </div>
+        <div class="col-lg-6 d-none d-lg-flex justify-content-center">
+          <div class="hero-mockup">
+            <div class="mockup-card shadow-lg">
+              <div class="mockup-header">
+                <div class="mockup-dots">
+                  <span></span><span></span><span></span>
+                </div>
+                <span class="mockup-title">Nouvelle campagne</span>
+              </div>
+              <div class="mockup-body">
+                <div class="mockup-field">
+                  <label>Tu fais quoi ?</label>
+                  <div class="mockup-chips">
+                    <span class="chip active">React</span>
+                    <span class="chip">Node.js</span>
+                    <span class="chip">Flutter</span>
+                    <span class="chip">Vue</span>
+                  </div>
+                </div>
+                <div class="mockup-field mt-3">
+                  <label>Type de client ?</label>
+                  <div class="mockup-chips">
+                    <span class="chip active">Startup</span>
+                    <span class="chip">PME</span>
+                    <span class="chip">Agence</span>
+                  </div>
+                </div>
+                <div class="mockup-field mt-3">
+                  <label>Nombre de prospects</label>
+                  <div class="mockup-slider">
+                    <div class="slider-track">
+                      <div class="slider-fill" style="width: 60%"></div>
+                    </div>
+                    <span class="slider-value">15</span>
+                  </div>
+                </div>
+                <button class="mockup-btn mt-4">⚡ Générer les emails</button>
+              </div>
+            </div>
+            <div class="mockup-email-preview shadow">
+              <div class="email-from">✉️ <strong>À :</strong> marie.dupont&#64;techstartup.fr</div>
+              <div class="email-subject">Objet : TechStartup + React = combo gagnant ?</div>
+              <div class="email-body">Bonjour Marie, j'ai vu que TechStartup.fr cherche à accélérer son frontend...</div>
+              <div class="email-score"><span class="badge bg-success">Score 94</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FEATURES -->
+  <section class="lf-features py-6" id="features">
+    <div class="container">
+      <div class="text-center mb-5">
+        <h2 class="lf-section-title">Tout ce dont tu as besoin</h2>
+        <p class="text-muted">Sans la complexité des outils enterprise</p>
+      </div>
+      <div class="row g-4">
+        <div class="col-md-4" *ngFor="let feature of features">
+          <div class="lf-feature-card h-100">
+            <div class="feature-icon">{{ feature.icon }}</div>
+            <h5 class="fw-bold mt-3">{{ feature.title }}</h5>
+            <p class="text-muted">{{ feature.description }}</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- HOW IT WORKS -->
+  <section class="lf-how py-6" id="demo">
+    <div class="container">
+      <div class="text-center mb-5">
+        <h2 class="lf-section-title">En 3 étapes simples</h2>
+      </div>
+      <div class="row g-4 justify-content-center">
+        <div class="col-md-4 text-center" *ngFor="let step of steps; let i = index">
+          <div class="step-number">{{ i + 1 }}</div>
+          <h5 class="fw-bold mt-3">{{ step.title }}</h5>
+          <p class="text-muted">{{ step.description }}</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PRICING -->
+  <section class="lf-pricing py-6" id="pricing">
+    <div class="container">
+      <div class="text-center mb-5">
+        <h2 class="lf-section-title">Paye uniquement ce que tu utilises</h2>
+        <p class="text-muted">Pas d'abonnement · Crédits valables 1 an · 25 crédits offerts à l'inscription</p>
+      </div>
+      <div class="row g-4 justify-content-center">
+        <div class="col-sm-6 col-lg-3" *ngFor="let plan of plans">
+          <div class="lf-plan-card h-100" [class.lf-plan-popular]="plan.popular">
+            <div *ngIf="plan.popular" class="plan-badge">⭐ Populaire</div>
+            <div *ngIf="plan.savings" class="plan-savings">Économisez {{ plan.savings }}</div>
+            <div class="plan-price">
+              <span class="price-amount">{{ plan.price }}€</span>
+            </div>
+            <h5 class="plan-name">{{ plan.credits }} crédits</h5>
+            <p class="text-muted small">{{ (plan.price / plan.credits).toFixed(2) }}€ / prospect</p>
+            <ul class="plan-features list-unstyled">
+              <li>✓ {{ plan.credits }} prospects qualifiés</li>
+              <li>✓ Emails personnalisés par IA</li>
+              <li>✓ Export CSV inclus</li>
+              <li>✓ Valables 1 an</li>
+            </ul>
+            <a routerLink="/register" class="btn w-100 mt-auto"
+               [class.lf-btn-primary]="plan.popular"
+               [class.btn-outline-primary]="!plan.popular">
+              Commencer →
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA FINAL -->
+  <section class="lf-cta py-6">
+    <div class="container text-center">
+      <h2 class="lf-section-title text-white">Prêt à trouver tes prochains clients ?</h2>
+      <p class="text-white-50 mb-4">25 crédits offerts, aucune carte bancaire requise</p>
+      <a routerLink="/register" class="btn btn-warning btn-lg fw-semibold px-5">
+        Créer mon compte gratuit →
+      </a>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer class="lf-footer py-4">
+    <div class="container d-flex flex-wrap justify-content-between align-items-center">
+      <span class="lf-logo">⚡ LeadForge</span>
+      <span class="text-muted small">© 2025 LeadForge · Fait pour les devs freelance</span>
+    </div>
+  </footer>
+
+</div>

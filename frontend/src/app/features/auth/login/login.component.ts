@@ -3,48 +3,46 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
 import { AuthService } from '../../../core/services/auth.service';
+import { environment } from '../../../../environments/environment';
 
 @Component({
   selector: 'app-login',
   standalone: true,
   imports: [CommonModule, FormsModule, RouterModule],
   templateUrl: './login.component.html',
-  styleUrls: ['./login.component.scss']
+    styleUrls: ['./login.component.scss']
 })
 export class LoginComponent {
   email = '';
   password = '';
   loading = false;
-  error = '';
+  errorMessage = '';
 
-  constructor(
-    private authService: AuthService,
-    private router: Router
-  ) {}
+  constructor(private authService: AuthService, private router: Router) {}
 
-  onSubmit() {
+  onLogin() {
     if (!this.email || !this.password) {
-      this.error = 'Veuillez remplir tous les champs';
+      this.errorMessage = 'Merci de remplir tous les champs.';
       return;
     }
 
     this.loading = true;
-    this.error = '';
+    this.errorMessage = '';
 
     this.authService.login({ email: this.email, password: this.password }).subscribe({
-      next: (response) => {
-        console.log('Login successful:', response);
-        this.loading = false;
+      next: () => {
         this.router.navigate(['/dashboard']);
       },
       error: (err) => {
-        console.error('Login error:', err);
         this.loading = false;
-        this.error = err.error || 'Erreur de connexion. Vérifiez vos identifiants.';
+        this.errorMessage = err.status === 401
+          ? 'Email ou mot de passe incorrect.'
+          : 'Une erreur est survenue. Réessaie.';
       }
     });
   }
+
   loginWithGoogle() {
-    window.location.href = 'https://leadforge-api-production-production.up.railway.app/api/auth/google/login';
+    window.location.href = `${environment.apiUrl}/auth/google/login`;
   }
 }

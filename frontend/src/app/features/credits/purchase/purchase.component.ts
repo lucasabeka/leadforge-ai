@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
 import { CreditService } from '../../../core/services/credit.service';
 import { AuthService } from '../../../core/services/auth.service';
+import { CREDIT_PACKAGES } from '../../../core/config/pricing.config';
 
 @Component({
   selector: 'app-purchase',
@@ -17,12 +18,7 @@ export class PurchaseComponent implements OnInit {
   loading = false;
   errorMessage = '';
 
-  packages = [
-    { credits: 100, price: 19, popular: false },
-    { credits: 500, price: 79, popular: true, savings: '17%' },
-    { credits: 1000, price: 139, popular: false, savings: '30%' },
-    { credits: 5000, price: 599, popular: false, savings: '40%' }
-  ];
+  packages = CREDIT_PACKAGES;
 
   constructor(
     private creditService: CreditService,

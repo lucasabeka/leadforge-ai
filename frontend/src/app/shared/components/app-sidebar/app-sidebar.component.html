@@ -1,0 +1,35 @@
+<aside class="lf-sidebar" [class.open]="open">
+  <div class="sidebar-logo">⚡ LeadForge</div>
+
+  <nav class="sidebar-nav">
+    <ul class="list-unstyled mb-0">
+      <li class="nav-item">
+        <a class="nav-link" routerLink="/dashboard" routerLinkActive="active">
+          <span class="nav-icon">📊</span> Dashboard
+        </a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" routerLink="/campaigns/new" routerLinkActive="active">
+          <span class="nav-icon">➕</span> Nouvelle campagne
+        </a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" routerLink="/credits/purchase" routerLinkActive="active">
+          <span class="nav-icon">💳</span> Crédits
+        </a>
+      </li>
+    </ul>
+  </nav>
+
+  <div class="sidebar-footer">
+    <div class="credits-badge">
+      <div class="credits-number">{{ credits }}</div>
+      <div class="credits-label">crédits restants</div>
+    </div>
+    <div class="user-info">
+      <div class="user-avatar">{{ userInitial }}</div>
+      <span class="user-email">{{ userEmail }}</span>
+      <button class="btn-logout" (click)="logout()" title="Déconnexion">↩</button>
+    </div>
+  </div>
+</aside>

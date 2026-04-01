@@ -1,44 +1,54 @@
-<div class="success-container">
-  <!-- Succès -->
-  <div class="success-card" *ngIf="!loading && success">
-    <div class="icon">✅</div>
-    <h1>Paiement réussi !</h1>
-    <p class="credits">+{{ purchasedCredits }} crédits ajoutés</p>
-    <p class="balance">Nouveau solde : <strong>{{ currentCredits }} crédits</strong></p>
+<div class="success-page">
 
-    <div class="actions">
-      <button class="btn-primary" routerLink="/dashboard">
+  <!-- LOADING -->
+  <div *ngIf="loading" class="state-wrapper">
+    <div class="lf-spinner mx-auto mb-4"></div>
+    <p class="state-title">Vérification du paiement...</p>
+    <p class="state-sub">Quelques secondes</p>
+  </div>
+
+  <!-- SUCCÈS -->
+  <div *ngIf="!loading && success" class="state-wrapper" style="animation: slideUp 0.4s ease-out;">
+    <div class="success-icon">✅</div>
+    <h1 class="state-title">Paiement confirmé !</h1>
+
+    <div class="credits-banner">
+      <span class="credits-added">+{{ purchasedCredits }}</span>
+      <span class="credits-label">crédits ajoutés</span>
+    </div>
+
+    <div class="balance-row">
+      <span class="balance-label">Nouveau solde</span>
+      <span class="balance-value">{{ currentCredits }} crédits</span>
+    </div>
+
+    <div class="action-group">
+      <a routerLink="/campaigns/new" class="btn lf-btn-primary btn-lg w-100">
+        ⚡ Lancer une campagne
+      </a>
+      <a routerLink="/dashboard" class="btn btn-outline-secondary w-100">
         Retour au dashboard
-      </button>
-      <button class="btn-secondary" routerLink="/campaigns/new">
-        Créer une campagne
-      </button>
+      </a>
     </div>
   </div>
 
-  <!-- Erreur -->
-  <div class="error-card" *ngIf="!loading && !success">
-    <div class="icon">❌</div>
-    <h1>Erreur de paiement</h1>
-    <p class="error-message">{{ errorMessage }}</p>
-    <p class="help-text">
-      Si le problème persiste, contactez-nous à support&#64;leadforge.app
+  <!-- ERREUR -->
+  <div *ngIf="!loading && !success" class="state-wrapper" style="animation: slideUp 0.4s ease-out;">
+    <div class="error-icon">❌</div>
+    <h1 class="state-title">Paiement non confirmé</h1>
+    <div class="lf-alert lf-alert-danger mt-3 mb-4">{{ errorMessage }}</div>
+    <p class="state-sub">
+      Si le problème persiste, contactez
+      <a href="mailto:support@leadforge.app">support&#64;leadforge.app</a>
     </p>
-
-    <div class="actions">
-      <button class="btn-secondary" routerLink="/purchase">
+    <div class="action-group">
+      <a routerLink="/credits/purchase" class="btn lf-btn-primary w-100">
         Réessayer
-      </button>
-      <button class="btn-tertiary" routerLink="/dashboard">
+      </a>
+      <a routerLink="/dashboard" class="btn btn-outline-secondary w-100">
         Retour au dashboard
-      </button>
+      </a>
     </div>
   </div>
 
-  <!-- Loading -->
-  <div class="loading" *ngIf="loading">
-    <div class="spinner"></div>
-    <p>Vérification du paiement...</p>
-    <p class="subtext">Veuillez patienter quelques instants</p>
-  </div>
 </div>

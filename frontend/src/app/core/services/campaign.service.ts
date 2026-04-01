@@ -1,8 +1,7 @@
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '../../../environments/environment';
-import { AuthService } from './auth.service';
 
 export interface Campaign {
   id: number;
@@ -39,7 +38,7 @@ export interface CampaignRequest {
   location: string;
   jobTitle: string;
   painPoint: string;
-  numberOfProspects: number;  // NOUVEAU
+  numberOfProspects: number;
 }
 
 @Injectable({
@@ -48,45 +47,21 @@ export interface CampaignRequest {
 export class CampaignService {
   private apiUrl = environment.apiUrl;
 
-  constructor(
-    private http: HttpClient,
-    private authService: AuthService
-  ) {}
+  constructor(private http: HttpClient) {}
 
   create(data: CampaignRequest): Observable<Campaign> {
-    return this.http.post<Campaign>(
-      `${this.apiUrl}/campaigns`,
-      data,
-      { headers: this.getHeaders() }
-    );
+    return this.http.post<Campaign>(`${this.apiUrl}/campaigns`, data);
   }
 
   list(): Observable<Campaign[]> {
-    return this.http.get<Campaign[]>(
-      `${this.apiUrl}/campaigns`,
-      { headers: this.getHeaders() }
-    );
+    return this.http.get<Campaign[]>(`${this.apiUrl}/campaigns`);
   }
 
   getById(id: number): Observable<Campaign> {
-    return this.http.get<Campaign>(
-      `${this.apiUrl}/campaigns/${id}`,
-      { headers: this.getHeaders() }
-    );
+    return this.http.get<Campaign>(`${this.apiUrl}/campaigns/${id}`);
   }
 
   getProspects(campaignId: number): Observable<Prospect[]> {
-    return this.http.get<Prospect[]>(
-      `${this.apiUrl}/campaigns/${campaignId}/prospects`,
-      { headers: this.getHeaders() }
-    );
-  }
-
-  private getHeaders(): HttpHeaders {
-    const token = this.authService.getToken();
-    return new HttpHeaders({
-      'Content-Type': 'application/json',
-      'Authorization': `Bearer ${token}`
-    });
+    return this.http.get<Prospect[]>(`${this.apiUrl}/campaigns/${campaignId}/prospects`);
   }
 }

@@ -15,6 +15,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 import java.util.concurrent.CompletableFuture;
+import java.util.stream.Collectors;
 
 @Service
 public class CampaignService {
@@ -43,39 +44,33 @@ public class CampaignService {
             campaign.setStatus(CampaignStatus.PROCESSING);
             campaignRepository.save(campaign);
 
-            Thread.sleep(3000);
             List<Prospect> prospects = generateMockProspects(campaign);
+            List<CompletableFuture<Void>> futures = prospects.stream()
+                    .map(prospect -> CompletableFuture.runAsync(() -> {
+                        try {
+                            prospect.setEmailSubject(claudeService.generateEmailSubject(
+                                    prospect.getCompany(),
+                                    campaign.getPainPoint()
+                            ));
+                            prospect.setEmailBody(claudeService.generatePersonalizedEmail(
+                                    prospect.getName(),
+                                    prospect.getCompany(),
+                                    prospect.getJobTitle(),
+                                    prospect.getLocation(),
+                                    campaign.getIndustry(),
+                                    campaign.getCompanySize(),
+                                    campaign.getPainPoint()
+                            ));
+                        } catch (Exception e) {
+                            System.err.println("Erreur génération email pour " +
+                                    prospect.getName() + ": " + e.getMessage());
+                            prospect.setEmailSubject(generateFallbackSubject(prospect, campaign));
+                            prospect.setEmailBody(generateFallbackEmail(prospect, campaign));
+                        }
+                    }))
+                    .collect(Collectors.toList());
 
-
-            for (Prospect prospect : prospects) {
-                try {
-                    // Générer sujet avec Claude
-                    String subject = claudeService.generateEmailSubject(
-                            prospect.getCompany(),
-                            campaign.getPainPoint()
-                    );
-                    prospect.setEmailSubject(subject);
-
-
-                    String emailBody = claudeService.generatePersonalizedEmail(
-                            prospect.getName(),
-                            prospect.getCompany(),
-                            prospect.getJobTitle(),
-                            prospect.getLocation(),
-                            campaign.getIndustry(),
-                            campaign.getCompanySize(),
-                            campaign.getPainPoint()
-                    );
-                    prospect.setEmailBody(emailBody);
-
-                } catch (Exception e) {
-                    System.err.println("Erreur génération email pour " +
-                            prospect.getName() + ": " + e.getMessage());
-
-                    prospect.setEmailSubject(generateFallbackSubject(prospect, campaign));
-                    prospect.setEmailBody(generateFallbackEmail(prospect, campaign));
-                }
-            }
+            CompletableFuture.allOf(futures.toArray(new CompletableFuture[0])).join();
 
             prospectRepository.saveAll(prospects);
 

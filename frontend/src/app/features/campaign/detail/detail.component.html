@@ -1,167 +1,209 @@
-<div class="detail-container">
-  <!-- Header -->
-  <div class="detail-header">
-    <button class="back-btn" routerLink="/dashboard">
-      ← Retour au dashboard
-    </button>
-  </div>
+<!-- DÉTAIL CAMPAGNE -->
+<div class="app-layout">
 
-  <!-- Loading state -->
-  <div *ngIf="loading" class="loading-state">
-    <div class="spinner"></div>
-    <p>Chargement...</p>
-  </div>
+  <app-sidebar #sidebar></app-sidebar>
 
-  <!-- Campaign info -->
-  <div *ngIf="!loading && campaign" class="campaign-info">
-    <div class="info-header">
-      <div>
-        <h1>{{ campaign.name }}</h1>
-        <div class="campaign-meta">
-          <span class="meta-item">📍 {{ campaign.location }}</span>
-          <span class="meta-item">🏢 {{ campaign.industry }}</span>
-          <span class="meta-item">👔 {{ campaign.jobTitle }}</span>
-        </div>
-      </div>
-      <span class="status-badge" [class]="campaign.status.toLowerCase()">
-        {{ getStatusLabel(campaign.status) }}
-      </span>
-    </div>
+  <div class="app-main">
+    <header class="app-topbar">
+      <button class="btn-sidebar-toggle" (click)="sidebar.open = !sidebar.open">☰</button>
+      <span class="topbar-title">{{ campaign?.name || 'Campagne' }}</span>
+      <a routerLink="/dashboard" class="btn btn-sm btn-outline-secondary">← Retour</a>
+    </header>
 
-    <!-- Progress bar si en cours -->
-    <div *ngIf="campaign.status === 'PROCESSING'" class="progress-section">
-      <p class="progress-text">
-        🤖 Génération en cours... L'IA analyse et crée des emails personnalisés pour chaque prospect.
-      </p>
-      <div class="progress-bar">
-        <div class="progress-fill" [style.width.%]="getProgressPercentage()"></div>
-      </div>
-      <p class="progress-note">Cela prend généralement 2-3 minutes</p>
-    </div>
+    <main class="app-content">
 
-    <!-- Prospects section -->
-    <div *ngIf="campaign.status === 'COMPLETED'" class="prospects-section">
-      <div class="section-header">
-        <h2>🎯 {{ prospects.length }} Prospects générés</h2>
-        <div class="actions">
-          <button (click)="exportCSV()" class="btn-secondary">
-            📥 Exporter CSV
-          </button>
-          <button (click)="copyAllEmails()" class="btn-secondary">
-            📋 Copier emails
-          </button>
-        </div>
+      <!-- Loading initial -->
+      <div *ngIf="loading" class="text-center py-5">
+        <div class="lf-spinner mx-auto mb-3"></div>
+        <p class="text-muted">Chargement...</p>
       </div>
 
-      <!-- Filters -->
-      <div class="filters">
-        <div class="search-box">
-          <input
-            type="text"
-            [(ngModel)]="searchTerm"
-            (ngModelChange)="onSearchChange()"
-            placeholder="🔍 Rechercher par nom, entreprise, email..."
-            class="search-input"
-          />
-        </div>
-        <select [(ngModel)]="sortBy" (ngModelChange)="sortProspects()" class="sort-select">
-          <option value="score">Score (élevé → faible)</option>
-          <option value="name">Nom (A → Z)</option>
-          <option value="company">Entreprise (A → Z)</option>
-        </select>
-      </div>
+      <ng-container *ngIf="!loading && campaign">
 
-      <!-- Table responsive -->
-      <div class="table-container">
-        <table class="prospects-table">
-          <thead>
-            <tr>
-              <th>Score</th>
-              <th>Nom</th>
-              <th>Entreprise</th>
-              <th>Poste</th>
-              <th>Email</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr *ngFor="let prospect of filteredProspects" class="prospect-row">
-              <td>
-                <span
-                  class="score-badge"
-                  [class.high]="prospect.qualificationScore >= 90"
-                  [class.medium]="prospect.qualificationScore >= 80 && prospect.qualificationScore < 90"
-                >
-                  {{ prospect.qualificationScore }}
+        <!-- Header campagne -->
+        <div class="bg-white rounded-3 border p-4 mb-4">
+          <div class="d-flex flex-wrap align-items-start justify-content-between gap-3">
+            <div>
+              <div class="d-flex align-items-center gap-2 mb-1">
+                <h4 class="fw-bold mb-0">{{ campaign.name }}</h4>
+                <span class="status-badge" [class]="getStatusClass(campaign.status)">
+                  {{ getStatusLabel(campaign.status) }}
                 </span>
-              </td>
-              <td class="name-cell">
-                <strong>{{ prospect.name }}</strong>
-              </td>
-              <td>{{ prospect.company }}</td>
-              <td class="job-cell">{{ prospect.jobTitle }}</td>
-              <td class="email-cell">
-                <a [href]="'mailto:' + prospect.email" class="email-link">
-                  {{ prospect.email }}
-                </a>
-              </td>
-              <td class="actions-cell">
-                <button (click)="viewEmail(prospect)" class="btn-action" title="Voir l'email">
-                  📧
-                </button>
-                <a [href]="prospect.linkedinUrl" target="_blank" class="btn-action" title="LinkedIn">
-                  🔗
-                </a>
-              </td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
+              </div>
+              <p class="text-muted small mb-0">
+                {{ campaign.prospectsCount || 0 }} prospects ·
+                Créée le {{ campaign.createdAt | date:'d MMMM yyyy' }}
+              </p>
+            </div>
 
-      <!-- Empty state after filter -->
-      <div *ngIf="filteredProspects.length === 0" class="empty-search">
-        <p>Aucun prospect ne correspond à votre recherche</p>
-      </div>
-    </div>
+            <div class="d-flex align-items-center gap-2 flex-wrap" *ngIf="campaign.status === 'COMPLETED'">
+              <button class="btn btn-sm btn-outline-secondary" (click)="copyAllEmails()">
+                📋 Copier emails
+              </button>
+              <button class="btn btn-sm lf-btn-primary" (click)="exportCSV()">
+                ⬇ Export CSV
+              </button>
+              <span *ngIf="copyFeedback" class="lf-alert lf-alert-success py-1 px-3 mb-0">{{ copyFeedback }}</span>
+            </div>
+          </div>
 
-    <!-- Failed state -->
-    <div *ngIf="campaign.status === 'FAILED'" class="failed-state">
-      <h3>❌ Échec de la génération</h3>
-      <p>Une erreur est survenue lors de la génération des prospects.</p>
-      <button routerLink="/dashboard" class="btn-primary">
-        Retour au dashboard
-      </button>
-    </div>
+          <!-- Barre de progression -->
+          <div *ngIf="campaign.status === 'PROCESSING'" class="mt-3">
+            <div class="d-flex justify-content-between small text-muted mb-1">
+              <span>Génération en cours...</span>
+              <span>{{ getProgressPercentage() }}%</span>
+            </div>
+            <div class="progress" style="height: 6px; border-radius: 3px;">
+              <div
+                class="progress-bar"
+                style="background: var(--lf-primary); transition: width 0.5s;"
+                [style.width.%]="getProgressPercentage()"
+              ></div>
+            </div>
+            <p class="text-muted small mt-2 mb-0">
+              ⚡ Les emails sont générés par IA, ça prend 1-2 minutes...
+            </p>
+          </div>
+
+          <!-- Campagne échouée -->
+          <div *ngIf="campaign.status === 'FAILED'" class="lf-alert lf-alert-danger mt-3">
+            La génération a échoué. Tes crédits ont été remboursés automatiquement.
+            <a routerLink="/campaigns/new" class="ms-2">Réessayer →</a>
+          </div>
+        </div>
+
+        <!-- Filtres -->
+        <div *ngIf="prospects.length > 0" class="bg-white rounded-3 border p-3 mb-3">
+          <div class="row g-2 align-items-center">
+            <div class="col-sm-6">
+              <input
+                type="text"
+                class="lf-input"
+                [(ngModel)]="searchTerm"
+                (ngModelChange)="onSearchChange()"
+                placeholder="🔍 Rechercher un prospect..."
+              />
+            </div>
+            <div class="col-sm-4">
+              <select class="lf-select" [(ngModel)]="sortBy" (ngModelChange)="sortProspects()">
+                <option value="score">Trier par score</option>
+                <option value="name">Trier par nom</option>
+                <option value="company">Trier par entreprise</option>
+              </select>
+            </div>
+            <div class="col-sm-2 text-end text-muted small">
+              {{ filteredProspects.length }} résultats
+            </div>
+          </div>
+        </div>
+
+        <!-- Liste prospects -->
+        <div *ngIf="prospects.length > 0" class="d-flex flex-column gap-2">
+          <div
+            *ngFor="let prospect of filteredProspects"
+            class="lf-prospect-card"
+            (click)="viewEmail(prospect)"
+          >
+            <div class="d-flex align-items-center gap-3">
+              <!-- Score -->
+              <div class="prospect-score" [class]="getScoreClass(prospect.qualificationScore)">
+                {{ prospect.qualificationScore }}
+              </div>
+
+              <!-- Info -->
+              <div class="flex-1" style="min-width: 0;">
+                <div class="prospect-name">{{ prospect.name }}</div>
+                <div class="prospect-company">{{ prospect.company }} · {{ prospect.jobTitle }}</div>
+              </div>
+
+              <!-- Email & LinkedIn -->
+              <div class="d-none d-md-flex align-items-center gap-2">
+                <a
+                  [href]="generateMailtoLink(prospect)"
+                  class="btn btn-sm btn-outline-primary"
+                  (click)="$event.stopPropagation()"
+                  title="Ouvrir dans le client mail"
+                >
+                  ✉ Envoyer
+                </a>
+                <a
+                  [href]="prospect.linkedinUrl"
+                  target="_blank"
+                  rel="noopener"
+                  class="btn btn-sm btn-outline-secondary"
+                  (click)="$event.stopPropagation()"
+                  title="Voir sur LinkedIn"
+                >
+                  in
+                </a>
+              </div>
+
+              <span class="text-muted small d-none d-sm-block">Voir email →</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- En attente / vide -->
+        <div *ngIf="campaign.status === 'PENDING'" class="lf-empty bg-white rounded-3 border">
+          <div class="empty-icon">⏳</div>
+          <h5>En attente de génération</h5>
+          <p>La campagne va démarrer dans quelques secondes...</p>
+        </div>
+
+      </ng-container>
+    </main>
   </div>
 </div>
 
-<!-- Modal email preview -->
-<div *ngIf="selectedProspect" class="modal-overlay" (click)="closeModal()">
-  <div class="modal-content" (click)="$event.stopPropagation()">
-    <div class="modal-header">
-      <h3>Email pour {{ selectedProspect.name }}</h3>
-      <button (click)="closeModal()" class="close-btn">×</button>
-    </div>
-    <div class="modal-body">
-      <div class="email-preview">
-        <div class="email-field">
-          <strong>À :</strong> {{ selectedProspect.email }}
-        </div>
-        <div class="email-field">
-          <strong>Sujet :</strong> {{ selectedProspect.emailSubject }}
-        </div>
-        <div class="email-body">
-          <pre>{{ selectedProspect.emailBody }}</pre>
-        </div>
+<!-- MODAL EMAIL -->
+<div class="lf-modal-overlay" *ngIf="selectedProspect" (click)="closeModal()">
+  <div class="lf-modal" (click)="$event.stopPropagation()">
+
+    <div class="modal-header-lf">
+      <div>
+        <h5 class="fw-bold mb-1">{{ selectedProspect.name }}</h5>
+        <p class="text-muted small mb-0">
+          {{ selectedProspect.company }} · {{ selectedProspect.email }}
+        </p>
       </div>
-      <div class="modal-actions">
-        <button (click)="copyEmail(selectedProspect)" class="btn-secondary">
-          📋 Copier
-        </button>
-        <a [href]="generateMailtoLink(selectedProspect)" class="btn-primary">
-          📧 Ouvrir dans email
-        </a>
-      </div>
+      <button
+        class="btn btn-sm btn-outline-secondary"
+        (click)="closeModal()"
+      >✕</button>
     </div>
+
+    <div class="mb-3">
+      <div class="lf-label">Objet</div>
+      <div class="fw-semibold">{{ selectedProspect.emailSubject }}</div>
+    </div>
+
+    <div class="mb-4">
+      <div class="lf-label">Corps de l'email</div>
+      <div class="email-content">{{ selectedProspect.emailBody }}</div>
+    </div>
+
+    <div class="d-flex flex-wrap gap-2">
+      <a
+        [href]="generateMailtoLink(selectedProspect)"
+        class="btn lf-btn-primary btn-sm"
+      >
+        ✉ Ouvrir dans Mail
+      </a>
+      <button
+        class="btn btn-sm btn-outline-primary"
+        (click)="copyEmail(selectedProspect)"
+      >
+        📋 Copier
+      </button>
+      <a
+        [href]="selectedProspect.linkedinUrl"
+        target="_blank"
+        rel="noopener"
+        class="btn btn-sm btn-outline-secondary"
+      >
+        LinkedIn →
+      </a>
+    </div>
+
   </div>
 </div>

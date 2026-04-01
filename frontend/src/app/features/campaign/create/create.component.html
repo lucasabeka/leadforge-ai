@@ -1,232 +1,147 @@
-<div class="create-container">
-  <!-- Header avec bouton retour -->
-  <div class="page-header">
-    <button type="button" routerLink="/dashboard" class="back-button">
-      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <path d="M19 12H5M12 19l-7-7 7-7"/>
-      </svg>
-      Retour au dashboard
-    </button>
-  </div>
+<!-- CRÉATION DE CAMPAGNE -->
+<div class="app-layout">
 
-  <div class="create-card">
-    <h1>Nouvelle Campagne de Prospection</h1>
+  <app-sidebar #sidebar></app-sidebar>
 
-    <!-- NOUVEAU : Notification brouillon chargé -->
-    <div *ngIf="draftLoaded" class="draft-notification">
-      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
-        <polyline points="22 4 12 14.01 9 11.01"></polyline>
-      </svg>
-      <span>Votre brouillon a été restauré</span>
-      <button type="button" (click)="clearDraftAndRestart()" class="btn-clear-draft">
-        Recommencer
-      </button>
-    </div>
+  <div class="app-main">
+    <header class="app-topbar">
+      <button class="btn-sidebar-toggle" (click)="sidebar.open = !sidebar.open">☰</button>
+      <span class="topbar-title">Nouvelle campagne</span>
+      <span></span>
+    </header>
 
-    <div class="stepper">
-      <div class="step" [class.active]="currentStep === 1" [class.completed]="currentStep > 1">
-        <span class="step-number">1</span>
-        <span class="step-label">Informations</span>
-      </div>
-      <div class="step-line" [class.completed]="currentStep > 1"></div>
-      <div class="step" [class.active]="currentStep === 2" [class.completed]="currentStep > 2">
-        <span class="step-number">2</span>
-        <span class="step-label">Cible</span>
-      </div>
-      <div class="step-line" [class.completed]="currentStep > 2"></div>
-      <div class="step" [class.active]="currentStep === 3">
-        <span class="step-number">3</span>
-        <span class="step-label">Validation</span>
-      </div>
-    </div>
+    <main class="app-content">
+      <div class="row justify-content-center">
+        <div class="col-lg-8 col-xl-7">
 
-    <form (ngSubmit)="onSubmit()">
-      <!-- Étape 1 -->
-      <div *ngIf="currentStep === 1" class="form-step">
-        <div class="form-group">
-          <label for="name">Nom de la campagne *</label>
-          <input
-            type="text"
-            id="name"
-            [(ngModel)]="campaign.name"
-            name="name"
-            placeholder="Ex: Agences Marketing Paris Q1 2025"
-            (ngModelChange)="onFormChange()"
-            required
-          />
-        </div>
-
-        <div class="form-group">
-          <label for="industry">Industrie cible *</label>
-          <select id="industry" [(ngModel)]="campaign.industry" name="industry" (ngModelChange)="onFormChange()" required>
-            <option value="">Sélectionnez une industrie</option>
-            <option *ngFor="let industry of industries" [value]="industry">
-              {{ industry }}
-            </option>
-          </select>
-        </div>
-
-        <div *ngIf="error" class="error-message">{{ error }}</div>
-
-        <div class="button-group">
-          <button type="button" routerLink="/dashboard" class="btn-secondary">
-            Annuler
-          </button>
-          <button type="button" (click)="nextStep()" class="btn-primary">
-            Suivant
-          </button>
-        </div>
-      </div>
-
-      <!-- Étape 2 -->
-      <div *ngIf="currentStep === 2" class="form-step">
-        <div class="form-group">
-          <label for="companySize">Taille d'entreprise *</label>
-          <select id="companySize" [(ngModel)]="campaign.companySize" name="companySize" (ngModelChange)="onFormChange()" required>
-            <option value="">Sélectionnez une taille</option>
-            <option *ngFor="let size of companySizes" [value]="size">
-              {{ size }}
-            </option>
-          </select>
-        </div>
-
-        <div class="form-group">
-          <label for="location">Localisation *</label>
-          <input
-            type="text"
-            id="location"
-            [(ngModel)]="campaign.location"
-            name="location"
-            placeholder="Ex: Paris, France"
-            (ngModelChange)="onFormChange()"
-            required
-          />
-        </div>
-
-        <div class="form-group">
-          <label for="jobTitle">Poste du décideur *</label>
-          <input
-            type="text"
-            id="jobTitle"
-            [(ngModel)]="campaign.jobTitle"
-            name="jobTitle"
-            placeholder="Ex: CEO, CMO, Directeur Marketing"
-            (ngModelChange)="onFormChange()"
-            required
-          />
-        </div>
-
-        <div *ngIf="error" class="error-message">{{ error }}</div>
-
-        <div class="button-group">
-          <button type="button" (click)="previousStep()" class="btn-secondary">
-            Retour
-          </button>
-          <button type="button" (click)="nextStep()" class="btn-primary">
-            Suivant
-          </button>
-        </div>
-      </div>
-
-      <!-- Étape 3 -->
-      <div *ngIf="currentStep === 3" class="form-step">
-        <div class="form-group">
-          <label for="painPoint">Pain point / Objectif *</label>
-          <textarea
-            id="painPoint"
-            [(ngModel)]="campaign.painPoint"
-            name="painPoint"
-            rows="4"
-            placeholder="Ex: Acquérir plus de clients sans augmenter leur budget marketing"
-            (ngModelChange)="onFormChange()"
-            required
-          ></textarea>
-          <small>Quel problème votre service/produit résout-il pour cette cible ?</small>
-        </div>
-
-        <div class="form-group">
-          <label for="numberOfProspects">Nombre de prospects *</label>
-          <input
-            type="number"
-            id="numberOfProspects"
-            [(ngModel)]="campaign.numberOfProspects"
-            name="numberOfProspects"
-            min="10"
-            max="200"
-            step="10"
-            (ngModelChange)="onFormChange()"
-            required
-          />
-          <small>Entre 10 et 200 prospects (1 crédit = 1 prospect)</small>
-        </div>
-
-        <div class="summary-box">
-          <h3>Récapitulatif</h3>
-          <p><strong>Campagne:</strong> {{ campaign.name }}</p>
-          <p><strong>Cible:</strong> {{ campaign.jobTitle }} dans {{ campaign.industry }}</p>
-          <p><strong>Localisation:</strong> {{ campaign.location }}</p>
-          <p><strong>Taille:</strong> {{ campaign.companySize }}</p>
-          <p><strong>Nombre de prospects:</strong> {{ campaign.numberOfProspects }}</p>
-        </div>
-
-        <!-- Affichage des crédits disponibles -->
-        <div class="credits-status">
-          <div class="credits-available">
-            <span class="label">Crédits disponibles:</span>
-            <span class="value">{{ userCredits }}</span>
+          <!-- Alerte erreur -->
+          <div class="lf-alert lf-alert-danger mb-4" *ngIf="errorMessage">
+            {{ errorMessage }}
           </div>
-          <div class="credits-needed">
-            <span class="label">Crédits nécessaires:</span>
-            <span class="value">{{ creditCost }}</span>
-          </div>
-        </div>
 
-        <!-- Alerte crédits insuffisants -->
-        <div *ngIf="!hasEnoughCredits()" class="insufficient-credits-alert">
-          <div class="alert-content">
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
-              <line x1="12" y1="9" x2="12" y2="13"></line>
-              <line x1="12" y1="17" x2="12.01" y2="17"></line>
-            </svg>
-            <div class="alert-text">
-              <strong>Crédits insuffisants</strong>
-              <p>Il vous manque {{ creditCost - userCredits }} crédits pour créer cette campagne.</p>
-              <p class="draft-info">💾 Vos informations seront sauvegardées automatiquement</p>
+          <!-- Alerte crédits insuffisants -->
+          <div class="lf-alert lf-alert-danger mb-4" *ngIf="insufficientCredits">
+            Tu n'as pas assez de crédits. <a routerLink="/credits">Recharger ici →</a>
+          </div>
+
+          <div class="lf-form-card">
+
+            <!-- SECTION 1 : Identité de la campagne -->
+            <div class="form-section">
+              <div class="form-section-title">Nom de la campagne</div>
+              <input
+                type="text"
+                class="lf-input"
+                [(ngModel)]="campaignName"
+                placeholder="Ex: React devs pour startups Paris"
+                maxlength="60"
+              />
             </div>
+
+            <!-- SECTION 2 : Ta stack -->
+            <div class="form-section">
+              <div class="form-section-title">Tu fais quoi ? (ta stack principale)</div>
+              <div class="lf-chip-group">
+                <span
+                  *ngFor="let tech of techStacks"
+                  class="lf-chip"
+                  [class.active]="selectedStack === tech.value"
+                  (click)="selectStack(tech.value)"
+                >
+                  {{ tech.label }}
+                </span>
+              </div>
+            </div>
+
+            <!-- SECTION 3 : Type de client -->
+            <div class="form-section">
+              <div class="form-section-title">Quel type de client tu cherches ?</div>
+              <div class="lf-chip-group">
+                <span
+                  *ngFor="let type of clientTypes"
+                  class="lf-chip"
+                  [class.active]="selectedClientType === type.value"
+                  (click)="selectedClientType = type.value"
+                >
+                  {{ type.label }}
+                </span>
+              </div>
+            </div>
+
+            <!-- SECTION 4 : Zone géographique -->
+            <div class="form-section">
+              <div class="form-section-title">Ville ou remote ?</div>
+              <div class="lf-chip-group mb-3">
+                <span
+                  class="lf-chip"
+                  [class.active]="location === 'Remote'"
+                  (click)="location = 'Remote'; customLocation = ''"
+                >🌍 Remote</span>
+                <span
+                  class="lf-chip"
+                  [class.active]="location !== 'Remote' && location !== ''"
+                  (click)="focusCity()"
+                >📍 Une ville</span>
+              </div>
+              <input
+                #cityInput
+                type="text"
+                class="lf-input"
+                [(ngModel)]="customLocation"
+                (ngModelChange)="location = customLocation"
+                placeholder="Paris, Lyon, Bordeaux..."
+                *ngIf="location !== 'Remote'"
+              />
+            </div>
+
+            <!-- SECTION 5 : Nombre de prospects -->
+            <div class="form-section">
+              <div class="form-section-title">Nombre de prospects</div>
+              <div class="d-flex align-items-center gap-3 mb-2">
+                <span class="range-value">{{ numberOfProspects }}</span>
+                <span class="text-muted small">prospects</span>
+              </div>
+              <input
+                type="range"
+                class="lf-range"
+                min="5"
+                max="50"
+                step="5"
+                [(ngModel)]="numberOfProspects"
+              />
+              <div class="d-flex justify-content-between text-muted" style="font-size: 0.75rem;">
+                <span>5</span>
+                <span>50</span>
+              </div>
+
+              <div class="credit-cost mt-3">
+                <span class="cost-label">💳 Coût de cette campagne</span>
+                <span class="cost-value">{{ numberOfProspects }} crédits</span>
+              </div>
+
+              <div *ngIf="credits < numberOfProspects" class="lf-alert lf-alert-danger mt-2">
+                Il te manque {{ numberOfProspects - credits }} crédits.
+                <a routerLink="/credits">Recharger →</a>
+              </div>
+            </div>
+
+            <!-- SUBMIT -->
+            <button
+              class="btn lf-btn-primary w-100 btn-lg mt-2"
+              (click)="onSubmit()"
+              [disabled]="loading || credits < numberOfProspects || !isFormValid"
+            >
+              <span *ngIf="loading" class="spinner-border spinner-border-sm me-2"></span>
+              {{ loading ? 'Génération en cours...' : '⚡ Lancer la campagne' }}
+            </button>
+
+            <p class="text-center text-muted small mt-2">
+              Les emails seront générés par IA et disponibles en quelques minutes
+            </p>
+
           </div>
-          <button type="button" (click)="goToBuyCredits()" class="btn-buy-credits">
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <circle cx="9" cy="21" r="1"></circle>
-              <circle cx="20" cy="21" r="1"></circle>
-              <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
-            </svg>
-            Acheter des crédits
-          </button>
-        </div>
-
-        <!-- Info coût (uniquement si crédits suffisants) -->
-        <div *ngIf="hasEnoughCredits()" class="credit-info">
-          <p>💳 Cette campagne coûtera <strong>{{ creditCost }} crédits</strong> ({{ campaign.numberOfProspects }} prospects générés)</p>
-        </div>
-
-        <div *ngIf="error" class="error-message">{{ error }}</div>
-
-        <div class="button-group">
-          <button type="button" (click)="previousStep()" class="btn-secondary">
-            Retour
-          </button>
-          <button
-            type="submit"
-            [disabled]="loading || !hasEnoughCredits()"
-            class="btn-primary"
-            [class.disabled]="!hasEnoughCredits()"
-          >
-            {{ loading ? 'Création en cours...' : 'Créer la campagne' }}
-          </button>
         </div>
       </div>
-    </form>
+    </main>
   </div>
 </div>

@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
 import { AuthService } from '../../../core/services/auth.service';
+import { environment } from '../../../../environments/environment';
 
 @Component({
   selector: 'app-register',
@@ -15,49 +16,42 @@ export class RegisterComponent {
   name = '';
   email = '';
   password = '';
-  confirmPassword = '';
   loading = false;
-  error = '';
+  errorMessage = '';
 
-  constructor(
-    private authService: AuthService,
-    private router: Router
-  ) {}
+  perks = [
+    { icon: '🎁', title: '25 crédits offerts', desc: 'Génère tes premières campagnes gratuitement' },
+    { icon: '⚡', title: 'Emails en 2 minutes', desc: 'Notre IA personnalise chaque email' },
+    { icon: '🔒', title: 'Sans carte bancaire', desc: 'Tu paies seulement si tu veux plus de crédits' }
+  ];
 
-  onSubmit() {
+  constructor(private authService: AuthService, private router: Router) {}
+
+  onRegister() {
     if (!this.name || !this.email || !this.password) {
-      this.error = 'Veuillez remplir tous les champs';
+      this.errorMessage = 'Merci de remplir tous les champs.';
       return;
     }
-
-    if (this.password.length < 6) {
-      this.error = 'Le mot de passe doit faire au moins 6 caractères';
-      return;
-    }
-
-    if (this.password !== this.confirmPassword) {
-      this.error = 'Les mots de passe ne correspondent pas';
+    if (this.password.length < 8) {
+      this.errorMessage = 'Le mot de passe doit faire au moins 8 caractères.';
       return;
     }
 
     this.loading = true;
-    this.error = '';
+    this.errorMessage = '';
 
-    this.authService.register({
-      name: this.name,
-      email: this.email,
-      password: this.password
-    }).subscribe({
-      next: (response) => {
-        console.log('Registration successful:', response);
-        this.loading = false;
+    this.authService.register({ name: this.name, email: this.email, password: this.password }).subscribe({
+      next: () => {
         this.router.navigate(['/dashboard']);
       },
       error: (err) => {
-        console.error('Registration error:', err);
         this.loading = false;
-        this.error = err.error || 'Erreur lors de l\'inscription';
+        this.errorMessage = err.error || 'Une erreur est survenue. Réessaie.';
       }
     });
+  }
+
+  loginWithGoogle() {
+    window.location.href = `${environment.apiUrl}/auth/google/login`;
   }
 }

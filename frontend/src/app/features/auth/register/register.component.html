@@ -1,79 +1,109 @@
-<div class="register-container">
-  <div class="register-card">
-    <h1>Créer un compte</h1>
-    <p class="subtitle">Commencez à générer des prospects en 2 minutes</p>
+<!-- REGISTER PAGE -->
+<div class="auth-page">
 
-    <form (ngSubmit)="onSubmit()" #registerForm="ngForm">
-      <div class="form-group">
-        <label for="name">Nom complet</label>
+  <!-- GAUCHE : formulaire -->
+  <div class="auth-left">
+    <a routerLink="/" class="auth-logo">⚡ LeadForge</a>
+
+    <h1 class="auth-title">Créer ton compte</h1>
+    <p class="auth-subtitle">25 crédits offerts, aucune carte requise</p>
+
+    <div class="lf-alert lf-alert-danger mb-4" *ngIf="errorMessage">
+      {{ errorMessage }}
+    </div>
+
+    <form (ngSubmit)="onRegister()">
+      <div class="mb-3">
+        <label class="lf-label" for="name">Ton prénom</label>
         <input
-          type="text"
           id="name"
-          name="name"
+          type="text"
+          class="lf-input"
           [(ngModel)]="name"
-          required
-          placeholder="Jean Dupont"
+          name="name"
+          placeholder="Thomas"
           [disabled]="loading"
+          required
         />
       </div>
 
-      <div class="form-group">
-        <label for="email">Email</label>
+      <div class="mb-3">
+        <label class="lf-label" for="email">Adresse email</label>
         <input
-          type="email"
           id="email"
-          name="email"
+          type="email"
+          class="lf-input"
           [(ngModel)]="email"
-          required
-          email
-          placeholder="jean@exemple.com"
+          name="email"
+          placeholder="toi@example.com"
           [disabled]="loading"
+          required
         />
       </div>
 
-      <div class="form-group">
-        <label for="password">Mot de passe</label>
+      <div class="mb-4">
+        <label class="lf-label" for="password">Mot de passe</label>
         <input
-          type="password"
           id="password"
-          name="password"
-          [(ngModel)]="password"
-          required
-          minlength="6"
-          placeholder="••••••••"
-          [disabled]="loading"
-        />
-      </div>
-
-      <div class="form-group">
-        <label for="confirmPassword">Confirmer mot de passe</label>
-        <input
           type="password"
-          id="confirmPassword"
-          name="confirmPassword"
-          [(ngModel)]="confirmPassword"
-          required
-          placeholder="••••••••"
+          class="lf-input"
+          [(ngModel)]="password"
+          name="password"
+          placeholder="Minimum 8 caractères"
           [disabled]="loading"
+          required
+          minlength="8"
         />
-      </div>
-
-      <div *ngIf="error" class="error-message">
-        {{ error }}
       </div>
 
       <button
         type="submit"
-        class="btn-primary"
-        [disabled]="!registerForm.valid || loading"
+        class="btn lf-btn-primary w-100"
+        [disabled]="loading"
       >
-        {{ loading ? 'Création...' : 'Créer mon compte' }}
+        <span *ngIf="loading" class="spinner-border spinner-border-sm me-2"></span>
+        {{ loading ? 'Création en cours...' : 'Créer mon compte gratuit' }}
       </button>
-
-      <p class="login-link">
-        Déjà un compte ?
-        <a routerLink="/login">Se connecter</a>
-      </p>
     </form>
+
+    <div class="lf-divider">ou</div>
+
+    <button class="btn-google" (click)="loginWithGoogle()" [disabled]="loading">
+      <img src="https://www.google.com/favicon.ico" width="16" alt="Google">
+      Continuer avec Google
+    </button>
+
+    <p class="text-center mt-4 small text-muted">
+      Déjà un compte ?
+      <a routerLink="/login" style="color: var(--lf-primary)">Se connecter</a>
+    </p>
+
+    <p class="text-center mt-3" style="font-size: 0.72rem; color: #bbb;">
+      En créant un compte tu acceptes nos conditions d'utilisation.
+    </p>
   </div>
+
+  <!-- DROITE -->
+  <div class="auth-right">
+    <div class="auth-right-content">
+      <h2>Tu codes, on prospecte 🚀</h2>
+      <p>
+        Choisis ta stack, ton type de client, et LeadForge génère
+        des emails personnalisés pour des prospects qualifiés.
+        Plus de temps à perdre sur LinkedIn.
+      </p>
+
+      <!-- Feature list -->
+      <div class="mt-4 d-flex flex-column gap-3">
+        <div *ngFor="let item of perks" class="d-flex align-items-start gap-3">
+          <span style="font-size: 1.2rem;">{{ item.icon }}</span>
+          <div>
+            <div class="fw-semibold" style="font-size: 0.9rem;">{{ item.title }}</div>
+            <div style="font-size: 0.8rem; color: rgba(255,255,255,0.5);">{{ item.desc }}</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
 </div>

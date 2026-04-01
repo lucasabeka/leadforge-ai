@@ -1,70 +1,102 @@
-<div class="dashboard-container">
-  <header class="dashboard-header">
-    <div class="header-left">
-      <h1>LeadForge AI</h1>
-      <p *ngIf="user$ | async as user" class="user-name">{{ user.name }}</p>
-    </div>
-    <div class="header-actions">
-      <button routerLink="/campaigns/new" class="btn-primary">
+<!-- DASHBOARD -->
+<div class="app-layout">
+
+  <app-sidebar #sidebar></app-sidebar>
+
+  <!-- MAIN -->
+  <div class="app-main">
+
+    <!-- TOPBAR -->
+    <header class="app-topbar">
+      <button class="btn-sidebar-toggle" (click)="sidebar.open = !sidebar.open">☰</button>
+      <span class="topbar-title">Dashboard</span>
+      <a routerLink="/campaigns/new" class="btn lf-btn-primary btn-sm">
         + Nouvelle campagne
-      </button>
-      <button (click)="logout()" class="btn-secondary">
-        Déconnexion
-      </button>
-    </div>
-  </header>
+      </a>
+    </header>
 
-  <div class="stats-row">
-    <div class="stat-card">
-      <h3>{{ stats.campaigns }}</h3>
-      <p>Campagnes</p>
-    </div>
-    <div class="stat-card">
-      <h3>{{ stats.prospects }}</h3>
-      <p>Prospects générés</p>
-    </div>
-    <div class="stat-card highlight" routerLink="/credits/purchase" style="cursor: pointer;">
-      <h3>{{ stats.credits }}</h3>
-      <p>Crédits restants</p>
-      <small style="margin-top: 8px; display: block; font-weight: 600;">
-        + Acheter des crédits
-      </small>
-    </div>
-  </div>
+    <!-- CONTENT -->
+    <main class="app-content">
 
-  <div class="campaigns-section">
-    <h2>Mes Campagnes</h2>
-
-    <div *ngIf="loading" class="loading">
-      Chargement...
-    </div>
-
-    <div *ngIf="!loading && campaigns.length > 0" class="campaigns-grid">
-      <div *ngFor="let campaign of campaigns"
-           class="campaign-card"
-           [routerLink]="['/campaigns', campaign.id]">
-        <div class="campaign-header">
-          <h3>{{ campaign.name }}</h3>
-          <span class="status-badge" [class]="campaign.status.toLowerCase()">
-            {{ getStatusLabel(campaign.status) }}
-          </span>
+      <!-- Stats -->
+      <div class="row g-3 mb-4">
+        <div class="col-6 col-md-3">
+          <div class="lf-stat-card">
+            <div class="stat-icon icon-primary">📋</div>
+            <div class="stat-value">{{ campaigns.length }}</div>
+            <div class="stat-label">Campagnes</div>
+          </div>
         </div>
-        <div class="campaign-details">
-          <p><strong>Industrie:</strong> {{ campaign.industry }}</p>
-          <p><strong>Cible:</strong> {{ campaign.jobTitle }}</p>
-          <p><strong>Localisation:</strong> {{ campaign.location }}</p>
-          <p><strong>Prospects:</strong> {{ campaign.prospectsCount || 0 }}</p>
-          <p class="date">{{ campaign.createdAt | date:'short' }}</p>
+        <div class="col-6 col-md-3">
+          <div class="lf-stat-card">
+            <div class="stat-icon icon-success">👥</div>
+            <div class="stat-value">{{ totalProspects }}</div>
+            <div class="stat-label">Prospects générés</div>
+          </div>
+        </div>
+        <div class="col-6 col-md-3">
+          <div class="lf-stat-card">
+            <div class="stat-icon icon-warning">⚡</div>
+            <div class="stat-value">{{ credits }}</div>
+            <div class="stat-label">Crédits restants</div>
+          </div>
+        </div>
+        <div class="col-6 col-md-3">
+          <div class="lf-stat-card">
+            <div class="stat-icon icon-primary">✅</div>
+            <div class="stat-value">{{ completedCount }}</div>
+            <div class="stat-label">Terminées</div>
+          </div>
         </div>
       </div>
-    </div>
 
-    <div *ngIf="!loading && campaigns.length === 0" class="empty-state">
-      <h3>Aucune campagne pour le moment</h3>
-      <p>Créez votre première campagne pour commencer à générer des prospects</p>
-      <button routerLink="/campaigns/new" class="btn-primary">
-        Créer ma première campagne
-      </button>
-    </div>
+      <!-- Campagnes -->
+      <div class="d-flex justify-content-between align-items-center mb-3">
+        <h5 class="fw-bold mb-0">Mes campagnes</h5>
+        <a routerLink="/campaigns/new" class="btn btn-sm btn-outline-primary">Nouvelle →</a>
+      </div>
+
+      <!-- Loading -->
+      <div *ngIf="loading" class="text-center py-5">
+        <div class="lf-spinner mx-auto mb-3"></div>
+        <p class="text-muted">Chargement...</p>
+      </div>
+
+      <!-- Empty state -->
+      <div *ngIf="!loading && campaigns.length === 0" class="lf-empty bg-white rounded-3 border">
+        <div class="empty-icon">🚀</div>
+        <h5>Lance ta première campagne</h5>
+        <p>Dis-nous ta stack et le type de client que tu cherches. On génère les emails.</p>
+        <a routerLink="/campaigns/new" class="btn lf-btn-primary">
+          Créer une campagne
+        </a>
+      </div>
+
+      <!-- Liste des campagnes -->
+      <div *ngIf="!loading && campaigns.length > 0" class="d-flex flex-column gap-2">
+        <a
+          *ngFor="let campaign of campaigns"
+          [routerLink]="['/campaigns', campaign.id]"
+          class="lf-campaign-card"
+        >
+          <div class="campaign-icon">📧</div>
+
+          <div class="campaign-info">
+            <div class="campaign-name">{{ campaign.name }}</div>
+            <div class="campaign-meta">
+              {{ campaign.prospectsCount || 0 }} prospects ·
+              {{ campaign.createdAt | date:'d MMM yyyy' }}
+            </div>
+          </div>
+
+          <div class="campaign-status-badge">
+            <span class="status-badge" [class]="getStatusClass(campaign.status)">
+              {{ getStatusLabel(campaign.status) }}
+            </span>
+          </div>
+        </a>
+      </div>
+
+    </main>
   </div>
 </div>

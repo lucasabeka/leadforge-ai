@@ -1,68 +1,97 @@
-<div class="login-container">
-  <div class="login-card">
-    <h1>Connexion à LeadForge</h1>
-    <p class="subtitle">Générez vos prospects B2B avec l'IA</p>
+<!-- LOGIN PAGE -->
+<div class="auth-page">
 
-    <form (ngSubmit)="onSubmit()" #loginForm="ngForm">
-      <div class="form-group">
-        <label for="email">Email</label>
+  <!-- GAUCHE : formulaire -->
+  <div class="auth-left">
+    <a routerLink="/" class="auth-logo">⚡ LeadForge</a>
+
+    <h1 class="auth-title">Bon retour 👋</h1>
+    <p class="auth-subtitle">Connecte-toi pour accéder à tes campagnes</p>
+
+    <!-- Alerte erreur -->
+    <div class="lf-alert lf-alert-danger mb-4" *ngIf="errorMessage">
+      {{ errorMessage }}
+    </div>
+
+    <!-- Formulaire -->
+    <form (ngSubmit)="onLogin()">
+      <div class="mb-3">
+        <label class="lf-label" for="email">Adresse email</label>
         <input
-          type="email"
           id="email"
-          name="email"
+          type="email"
+          class="lf-input"
           [(ngModel)]="email"
-          required
-          email
-          placeholder="exemple@email.com"
+          name="email"
+          placeholder="toi@example.com"
           [disabled]="loading"
+          required
         />
       </div>
 
-      <div class="form-group">
-        <label for="password">Mot de passe</label>
+      <div class="mb-4">
+        <div class="d-flex justify-content-between align-items-center mb-1">
+          <label class="lf-label mb-0" for="password">Mot de passe</label>
+          <a href="#" class="text-decoration-none small" style="color: var(--lf-primary)">Oublié ?</a>
+        </div>
         <input
-          type="password"
           id="password"
-          name="password"
+          type="password"
+          class="lf-input"
           [(ngModel)]="password"
-          required
-          minlength="6"
+          name="password"
           placeholder="••••••••"
           [disabled]="loading"
+          required
         />
-      </div>
-
-      <div *ngIf="error" class="error-message">
-        {{ error }}
       </div>
 
       <button
         type="submit"
-        class="btn-primary"
-        [disabled]="!loginForm.valid || loading"
+        class="btn lf-btn-primary w-100"
+        [disabled]="loading"
       >
+        <span *ngIf="loading" class="spinner-border spinner-border-sm me-2"></span>
         {{ loading ? 'Connexion...' : 'Se connecter' }}
       </button>
-      <div class="divider">
-        <span>ou</span>
-      </div>
-
-      <button type="button" class="btn-google" (click)="loginWithGoogle()">
-        <svg width="18" height="18" xmlns="http://www.w3.org/2000/svg">
-          <g fill="none" fill-rule="evenodd">
-            <path d="M17.6 9.2l-.1-1.8H9v3.4h4.8C13.6 12 13 13 12 13.6v2.2h3a8.8 8.8 0 0 0 2.6-6.6z" fill="#4285F4"/>
-            <path d="M9 18c2.4 0 4.5-.8 6-2.2l-3-2.2a5.4 5.4 0 0 1-8-2.9H1V13a9 9 0 0 0 8 5z" fill="#34A853"/>
-            <path d="M4 10.7a5.4 5.4 0 0 1 0-3.4V5H1a9 9 0 0 0 0 8l3-2.3z" fill="#FBBC05"/>
-            <path d="M9 3.6c1.3 0 2.5.4 3.4 1.3L15 2.3A9 9 0 0 0 1 5l3 2.4a5.4 5.4 0 0 1 5-3.7z" fill="#EA4335"/>
-          </g>
-        </svg>
-        Se connecter avec Google
-      </button>
-
-      <p class="register-link">
-        Pas encore de compte ?
-        <a routerLink="/register">Créer un compte</a>
-      </p>
     </form>
+
+    <div class="lf-divider">ou</div>
+
+    <button class="btn-google" (click)="loginWithGoogle()" [disabled]="loading">
+      <img src="https://www.google.com/favicon.ico" width="16" alt="Google">
+      Continuer avec Google
+    </button>
+
+    <p class="text-center mt-4 small text-muted">
+      Pas encore de compte ?
+      <a routerLink="/register" style="color: var(--lf-primary)">Créer un compte gratuit</a>
+    </p>
   </div>
+
+  <!-- DROITE : pitch -->
+  <div class="auth-right">
+    <div class="auth-right-content">
+      <h2>Trouve tes prochains clients<br>pendant que tu dors 💤</h2>
+      <p>
+        LeadForge génère des emails de prospection personnalisés pour les
+        devs freelance. Dis-nous ta stack, on fait le reste.
+      </p>
+
+      <div class="auth-testimonial">
+        <p class="testimonial-text">
+          "J'ai décroché 2 missions en 3 semaines grâce à LeadForge.
+          Les emails générés sont vraiment personnalisés, pas du template bête."
+        </p>
+        <div class="testimonial-author">
+          <div class="author-avatar">TL</div>
+          <div>
+            <div class="author-name">Thomas L.</div>
+            <div class="author-role">Dev React freelance · Paris</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
 </div>
